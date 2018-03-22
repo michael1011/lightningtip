@@ -1,34 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"github.com/op/go-logging"
 	"os"
 )
 
-var log = logging.MustGetLogger("lightningTip")
+var log = logging.MustGetLogger("")
 var logFormat = logging.MustStringFormatter("%{time:2006-01-02 15:04:05.000} [%{level}] %{message}")
+
+var backendConsole = logging.NewLogBackend(os.Stdout, "", 0)
 
 func initLog() {
 	logging.SetFormatter(logFormat)
-	logging.SetLevel(logging.DEBUG, "")
-
-	backendConsole := logging.NewLogBackend(os.Stdout, "", 0)
 
 	logging.SetBackend(backendConsole)
+}
 
-	file, err := os.OpenFile("lightningTip.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
+func initLogFile(logFile string, level logging.Level) {
+	file, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
 
-	if err == nil {
-		defer file.Close()
+	if err != nil {
+		log.Error("Failed to initialize log file: " + fmt.Sprint(err))
 
-		backendFile := logging.NewLogBackend(file, "", 0)
-
-		logging.SetBackend(backendConsole, backendFile)
-
-		log.Debug("Successfully initialized log file")
-
-	} else {
-		log.Critical("Failed to initialize log file: ", err)
+		return
 	}
 
+	backendFile := logging.NewLogBackend(file, "", 0)
+
+	backendFileLeveled := logging.AddModuleLevel(backendFile)
+	backendFileLeveled.SetLevel(level, "")
+
+	backendConsoleLeveled := logging.AddModuleLevel(backendConsole)
+	backendConsoleLeveled.SetLevel(level, "")
+
+	logging.SetBackend(backendConsoleLeveled, backendFileLeveled)
+
+	log.Debug("Successfully initialized log file")
 }

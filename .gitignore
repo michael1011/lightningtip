@@ -19,3 +19,9 @@ lightningTip
 
 # Log file
 lightningTip.log
+
+# Config file
+lightningTip.conf
+
+# Dep vendor directory
+vendor
