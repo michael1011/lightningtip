@@ -3,6 +3,7 @@
 *.dll
 *.so
 *.dylib
+lightningTip
 
 # Test binary, build with `go test -c`
 *.test
@@ -15,3 +16,6 @@
 
 # Jetbrain GoLand
 .idea
+
+# Log file
+lightningTip.log
