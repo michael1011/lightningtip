@@ -3,10 +3,13 @@ package backends
 import (
 	"context"
 	"encoding/hex"
+	"errors"
+	"fmt"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
+	"io"
 	"io/ioutil"
 )
 
@@ -75,4 +78,42 @@ func (lnd *LND) GetInvoice(description string, value int64, expiry int64) (invoi
 	}
 
 	return response.PaymentRequest, err
+}
+
+func (lnd *LND) SubscribeInvoices() error {
+	stream, err := lnd.client.SubscribeInvoices(lnd.ctx, &lnrpc.InvoiceSubscription{})
+
+	if err != nil {
+		return err
+	}
+
+	wait := make(chan struct{})
+
+	go func() {
+		for {
+			in, streamErr := stream.Recv()
+
+			if streamErr == io.EOF {
+				err = errors.New("lost connection to LND gRPC")
+
+				close(wait)
+
+				return
+			}
+
+			if streamErr != nil {
+				err = streamErr
+
+				close(wait)
+
+				return
+			}
+
+			fmt.Println(in)
+		}
+	}()
+
+	<-wait
+
+	return err
 }

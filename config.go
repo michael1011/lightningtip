@@ -10,11 +10,19 @@ import (
 	"strings"
 )
 
+// TODO: add option to show URI of Lightning node
+
 const (
 	defaultConfigFile = "lightningTip.conf"
 
 	defaultLogFile  = "lightningTip.log"
 	defaultLogLevel = "debug"
+
+	defaultRESTHost = "localhost:8081"
+
+	defaultTipMessage = "A generous tip"
+	defaultTipExpiry  = 3600
+	defaultTipValue   = 100
 
 	defaultLndRPCHost   = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
@@ -27,13 +35,18 @@ type config struct {
 	LogFile  string `long:"logfile" Description:"Log file location"`
 	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
 
+	RESTHost string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
+
+	TipMessage      string `long:"tipmessage" Description:"Message embedded in the payment request"`
+	TipExpiry       int64  `long:"tipexpiry" Description:"Expiry time in seconds"`
+	DefaultTipValue int64  `long:"defaulttipvalue" Description:"The default value of a tip in satoshis"`
+
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }
 
 var cfg config
 
 var backend backends.Backend
-var backendName string
 
 func initConfig() {
 	lndDir := getDefaultLndDir()
@@ -43,6 +56,12 @@ func initConfig() {
 
 		LogFile:  defaultLogFile,
 		LogLevel: defaultLogLevel,
+
+		RESTHost: defaultRESTHost,
+
+		TipMessage:      defaultTipMessage,
+		TipExpiry:       defaultTipExpiry,
+		DefaultTipValue: defaultTipValue,
 
 		LND: &backends.LND{
 			RPCHost:      defaultLndRPCHost,
@@ -82,9 +101,8 @@ func initConfig() {
 		log.Infof("Failed to parse config file: %v", errFile)
 	}
 
-	// TODO: add more backend options like for example c-lighting
+	// TODO: add more backend options like for example c-lighting and eclair
 	backend = cfg.LND
-	backendName = "LND"
 }
 
 func getDefaultLndDir() (dir string) {
