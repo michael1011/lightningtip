@@ -25,3 +25,4 @@ lightningTip.conf
 
 # Dep vendor directory
 vendor
+_vendor*

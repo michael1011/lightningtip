@@ -2,10 +2,36 @@
 
 
 [[projects]]
+  name = "github.com/golang/protobuf"
+  packages = [
+    "jsonpb",
+    "proto",
+    "protoc-gen-go/descriptor",
+    "ptypes/any",
+    "ptypes/struct"
+  ]
+  revision = "bbd03ef6da3a115852eaf24c8a1c46aeb39aa175"
+
+[[projects]]
+  name = "github.com/grpc-ecosystem/grpc-gateway"
+  packages = [
+    "runtime",
+    "runtime/internal",
+    "utilities"
+  ]
+  revision = "f2862b476edcef83412c7af8687c9cd8e4097c0f"
+
+[[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
   revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
   version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/lightningnetwork/lnd"
+  packages = ["lnrpc"]
+  revision = "b866806d67d80e5963ed398f55ab800031df1bf1"
+  version = "0.4-beta"
 
 [[projects]]
   name = "github.com/op/go-logging"
@@ -13,9 +39,72 @@
   revision = "b2cb9fa56473e98db8caba80237377e83fe44db5"
   version = "v1"
 
+[[projects]]
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "http2",
+    "http2/hpack",
+    "idna",
+    "internal/timeseries",
+    "lex/httplex",
+    "trace"
+  ]
+  revision = "ae89d30ce0c63142b652837da33d782e2b0a9b25"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
+[[projects]]
+  name = "google.golang.org/genproto"
+  packages = [
+    "googleapis/api/annotations",
+    "googleapis/rpc/status"
+  ]
+  revision = "df60624c1e9b9d2973e889c7a1cff73155da81c4"
+
+[[projects]]
+  name = "google.golang.org/grpc"
+  packages = [
+    ".",
+    "codes",
+    "connectivity",
+    "credentials",
+    "grpclb/grpc_lb_v1",
+    "grpclog",
+    "internal",
+    "keepalive",
+    "metadata",
+    "naming",
+    "peer",
+    "stats",
+    "status",
+    "tap",
+    "transport"
+  ]
+  revision = "b3ddf786825de56a4178401b7e174ee332173b66"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25f60b14acb88f3ea9cb02b446b7ccc98239db04d24c0052202d694ff35ff33a"
+  inputs-digest = "4f860bdd78949e728fd2a848ecbe315573961a90d2ab58faec2dff18948200e9"
   solver-name = "gps-cdcl"
   solver-version = 1
