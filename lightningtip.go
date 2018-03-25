@@ -9,24 +9,21 @@ import (
 	"strconv"
 )
 
-type getInvoiceRequest struct {
-	Value   int64
-	Message string
-}
-
 type invoiceResponse struct {
 	Invoice string
-	Error   string
+	Expiry  int64
 }
 
-type tipValueResponse struct {
-	TipValue int64
+type invoiceRequest struct {
+	Amount  int64
+	Message string
 }
 
 type errorResponse struct {
 	Error string
 }
 
+// TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
 
@@ -37,11 +34,11 @@ func main() {
 	if err == nil {
 		http.HandleFunc("/", notFoundHandler)
 		http.HandleFunc("/getinvoice", getInvoiceHandler)
-		http.HandleFunc("/defaulttipvalue", defaultTipValueHandler)
 
 		log.Info("Subscribing to invoices")
 
 		go func() {
+			// TODO: let clients listen if their invoice was paid (eventsource)
 			err = cfg.LND.SubscribeInvoices()
 
 			if err != nil {
@@ -72,66 +69,59 @@ func main() {
 }
 
 func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
-	var errorMessage string
-
-	tipValue := cfg.DefaultTipValue
-	tipMessage := cfg.TipMessage
+	errorMessage := "Could not parse values from request"
 
 	if request.Method == http.MethodPost {
-		var body getInvoiceRequest
+		var body invoiceRequest
 
 		data, _ := ioutil.ReadAll(request.Body)
 
 		err := json.Unmarshal(data, &body)
 
 		if err == nil {
-			if body.Value != 0 {
-				tipValue = body.Value
+			if body.Amount != 0 {
+				invoice, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
+
+				if err == nil {
+					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
+
+					if body.Message != "" {
+						logMessage += " with message \"" + body.Message + "\""
+					}
+
+					log.Info(logMessage)
+
+					writer.Write(marshalJson(invoiceResponse{
+						Invoice: invoice,
+						Expiry:  cfg.TipExpiry,
+					}))
+
+					return
+
+				} else {
+					errorMessage = "Failed to create invoice"
+				}
+
 			}
 
-			if body.Message != "" {
-				tipMessage = body.Message
-			}
-
-		} else {
-			errorMessage = "Could not parse values from request"
-
-			log.Warning(errorMessage)
 		}
 
 	}
 
-	invoice, err := backend.GetInvoice(tipMessage, tipValue, cfg.TipExpiry)
+	log.Error(errorMessage)
 
-	if err == nil {
-		log.Info("Created invoice with value of " + strconv.FormatInt(tipValue, 10) + " satoshis")
-
-		writer.Write(marshalJson(invoiceResponse{
-			Invoice: invoice,
-			Error:   errorMessage,
-		}))
-
-	} else {
-		errorMessage := "Failed to create invoice"
-
-		log.Error(errorMessage + ": " + fmt.Sprint(err))
-
-		writer.Write(marshalJson(errorResponse{
-			Error: errorMessage,
-		}))
-	}
-
-}
-
-func defaultTipValueHandler(writer http.ResponseWriter, request *http.Request) {
-	writer.Write(marshalJson(tipValueResponse{
-		TipValue: cfg.DefaultTipValue,
-	}))
+	writeError(writer, errorMessage)
 }
 
 func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
+	writeError(writer, "Not found")
+}
+
+func writeError(writer http.ResponseWriter, message string) {
+	writer.WriteHeader(http.StatusBadRequest)
+
 	writer.Write(marshalJson(errorResponse{
-		Error: "Not found",
+		Error: message,
 	}))
 }
 

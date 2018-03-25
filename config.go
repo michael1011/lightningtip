@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-// TODO: add option to show URI of Lightning node
-
 const (
 	defaultConfigFile = "lightningTip.conf"
 
@@ -20,9 +18,7 @@ const (
 
 	defaultRESTHost = "localhost:8081"
 
-	defaultTipMessage = "A generous tip"
-	defaultTipExpiry  = 3600
-	defaultTipValue   = 100
+	defaultTipExpiry = 3600
 
 	defaultLndRPCHost   = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
@@ -37,9 +33,7 @@ type config struct {
 
 	RESTHost string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
 
-	TipMessage      string `long:"tipmessage" Description:"Message embedded in the payment request"`
-	TipExpiry       int64  `long:"tipexpiry" Description:"Expiry time in seconds"`
-	DefaultTipValue int64  `long:"defaulttipvalue" Description:"The default value of a tip in satoshis"`
+	TipExpiry int64 `long:"tipexpiry" Description:"Expiry time in seconds"`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }
@@ -59,9 +53,7 @@ func initConfig() {
 
 		RESTHost: defaultRESTHost,
 
-		TipMessage:      defaultTipMessage,
-		TipExpiry:       defaultTipExpiry,
-		DefaultTipValue: defaultTipValue,
+		TipExpiry: defaultTipExpiry,
 
 		LND: &backends.LND{
 			RPCHost:      defaultLndRPCHost,

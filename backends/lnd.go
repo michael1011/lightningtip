@@ -66,12 +66,22 @@ func getMacaroon(macaroonFile string) (macaroon metadata.MD, err error) {
 	return macaroon, err
 }
 
-func (lnd *LND) GetInvoice(description string, value int64, expiry int64) (invoice string, err error) {
-	response, err := lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
-		Memo:   description,
-		Value:  value,
-		Expiry: expiry,
-	})
+func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, err error) {
+	var response *lnrpc.AddInvoiceResponse
+
+	if message != "" {
+		response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
+			Memo:   message,
+			Value:  amount,
+			Expiry: expiry,
+		})
+
+	} else {
+		response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
+			Value:  amount,
+			Expiry: expiry,
+		})
+	}
 
 	if err != nil {
 		return "", err

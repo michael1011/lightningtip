@@ -1,0 +1,111 @@
+#lightningTip {
+    width: 12em;
+
+    padding: 1em;
+
+    background-color: #212121;
+
+    border-radius: 4px;
+
+    color: #F5F5F5;
+
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+
+    text-align: center;
+}
+
+#lightningTipLogo {
+    margin-top: 0;
+    margin-bottom: 0.6em;
+
+    font-size: 25px;
+}
+
+#lightningTipInputs {
+    margin-top: 0.8em;
+}
+
+#lightningTipMessage {
+    min-height: 55px;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    margin-top: 0.5em;
+
+    padding: 8px 10px;
+}
+
+.lightningTipInput {
+    width: 100%;
+
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 4px;
+
+    font-size: 15px;
+
+    color: #212121;
+
+    background-color: #F5F5F5;
+
+    outline: none;
+    resize: none;
+
+    overflow-y: hidden;
+}
+
+#lightningTipGetInvoice {
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+
+    padding: 0.4em 1em;
+
+    font-size: 17px;
+
+    color: #212121;
+
+    background-color: #FFC83D;
+
+    border: none;
+    border-radius: 4px;
+
+    outline: none;
+    cursor: pointer;
+}
+
+#lightningTipError {
+    font-size: 17px;
+
+    color: #F44336;
+}
+
+#lightningTipInvoice {
+    margin-top: 0.8em;
+}
+
+.spinner {
+    width: 12px;
+    height: 12px;
+
+    display: inline-block;
+    vertical-align: center;
+
+    border: 3px solid #F5F5F5;
+    border-top: 3px solid #212121;
+    border-radius: 50%;
+
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,28 @@
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="lightningTip.css">
+
+    <script src="lightningTip.js"></script>
+    <!-- TODO: add qr code <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>-->
+    <!-- TODO: add option to open in wallet lightning:<invoice> -->
+</head>
+
+<div id="lightningTip">
+    <p id="lightningTipLogo">⚡</p>
+    <a>Send a tip via Lightning</a>
+
+    <div id="lightningTipInputs">
+        <input type="text" class="lightningTipInput" id="lightningTipAmount" placeholder="Amount in satoshis">
+        <br>
+        <textarea class="lightningTipInput" id="lightningTipMessage" placeholder="A message you want to add" oninput="resizeInput(this)"></textarea>
+
+        <button id="lightningTipGetInvoice" onclick="getInvoice()">Get Invoice</button>
+
+        <div>
+            <a id="lightningTipError"></a>
+        </div>
+
+    </div>
+
+</div>
