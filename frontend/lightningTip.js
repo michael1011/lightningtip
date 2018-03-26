@@ -3,67 +3,190 @@ function resizeInput(element) {
     element.style.height = (element.scrollHeight) + "px";
 }
 
+// To prohibit multiple requests at the same time
+var running = false;
 
+var invoice;
+var qrCode;
+
+var defaultGetInvoice;
+
+// TODO: listen to eventsource and show tank you when invoice settled
 function getInvoice() {
-    var tipValue = document.getElementById("lightningTipAmount");
+    if (running === false) {
+        running = true;
 
-    if (tipValue.value !== "") {
-        if (!isNaN(tipValue.value)) {
-            var data = JSON.stringify({"Amount": parseInt(tipValue.value), "Message": document.getElementById("lightningTipMessage").value});
+        var tipValue = document.getElementById("lightningTipAmount");
 
-            var request = new XMLHttpRequest();
+        if (tipValue.value !== "") {
 
-            request.onreadystatechange = function () {
-                if (request.readyState === 4) {
-                    var json = JSON.parse(request.responseText);
+            if (!isNaN(tipValue.value)) {
+                var data = JSON.stringify({"Amount": parseInt(tipValue.value), "Message": document.getElementById("lightningTipMessage").value});
 
-                    if (request.status === 200) {
-                        console.log("Got invoice: " + json.Invoice);
-                        console.log("Invoice expires in: " + json.Expiry);
+                var request = new XMLHttpRequest();
 
-                        var wrapper = document.getElementById("lightningTip");
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        try {
+                            var json = JSON.parse(request.responseText);
 
-                        // TODO: timer until expiry
-                        wrapper.innerHTML = "<a>Your invoice</a>";
-                        wrapper.innerHTML += "<textarea class='lightningTipInput' id='lightningTipInvoice' readonly>" + json.Invoice + "</textarea>";
+                            if (request.status === 200) {
+                                console.log("Got invoice: " + json.Invoice);
+                                console.log("Invoice expires in: " + json.Expiry);
 
-                        resizeInput(document.getElementById("lightningTipInvoice"))
+                                invoice = json.Invoice;
 
-                    } else {
-                        showErrorMessage(json.Error);
+                                var wrapper = document.getElementById("lightningTip");
+
+                                wrapper.innerHTML = "<a>Your invoice</a>";
+                                wrapper.innerHTML += "<textarea class='lightningTipInput' id='lightningTipInvoice' onclick='copyToClipboard(this)' readonly>" + json.Invoice + "</textarea>";
+                                wrapper.innerHTML += "<div id='lightningTipQR'></div>";
+
+                                resizeInput(document.getElementById("lightningTipInvoice"));
+
+                                wrapper.innerHTML += "<div id='lightningTipTools'>" +
+                                    "<button class='lightningTipButton' id='lightningTipGetQR' onclick='showQRCode()'>QR</button>" +
+                                    "<button class='lightningTipButton' id='lightningTipOpen'>Open</button>" +
+                                    "<a id='lightningTipExpiry'></a>" +
+                                    "</div>";
+
+                                starTimer(json.Expiry, document.getElementById("lightningTipExpiry"));
+
+                                document.getElementById("lightningTipTools").style.height = document.getElementById("lightningTipGetQR").clientHeight + "px";
+
+                                document.getElementById("lightningTipOpen").onclick = function () {
+                                    location.href = "lightning:" + json.Invoice;
+                                };
+
+                                running = false;
+
+                            } else {
+                                showErrorMessage(json.Error);
+                            }
+
+                        } catch (exception) {
+                            showErrorMessage("Failed to reach backend");
+                        }
+
                     }
 
-                }
+                };
 
-            };
+                // TODO: proper url handling window.location.protocol + window.location.hostname + ":8081/getinvoice"
+                request.open("POST", "http://localhost:8081/getinvoice", true);
+                request.send(data);
 
-            // TODO: proper url handling window.location.protocol + window.location.hostname + ":8081/getinvoice"
-            request.open("POST", "http://localhost:8081/getinvoice", true);
-            request.send(data);
+                var button = document.getElementById("lightningTipGetInvoice");
 
-            var button = document.getElementById("lightningTipGetInvoice");
+                button.style.height = button.clientHeight + "px";
+                button.style.width = button.clientWidth + "px";
 
-            button.style.height = button.clientHeight + "px";
-            button.style.width = button.clientWidth + "px";
+                defaultGetInvoice = button.innerHTML;
 
-            button.innerHTML = "<div class='spinner'></div>";
+                button.innerHTML = "<div class='spinner'></div>";
+
+            } else {
+                showErrorMessage("Tip amount must be a number");
+            }
 
         } else {
-            showErrorMessage("Tip amount must be a number");
+            showErrorMessage("No tip amount set");
         }
 
     } else {
-        showErrorMessage("No tip amount set");
+        console.warn("Last request still pending");
     }
 
 }
 
+function starTimer(duration, element) {
+    showTimer(duration, element);
+
+    var interval = setInterval(function () {
+        if (duration > 0) {
+            duration--;
+
+            showTimer(duration, element);
+
+        } else {
+            clearInterval(interval);
+        }
+
+    }, 1000);
+}
+
+function showTimer(duration, element) {
+    var seconds = Math.floor(duration % 60);
+    var minutes = Math.floor((duration / 60) % 60);
+    var hours = Math.floor((duration / (60 * 60)) % 24);
+
+    seconds = addLeadingZeros(seconds);
+    minutes = addLeadingZeros(minutes);
+
+    if (hours > 0) {
+        element.innerHTML = hours + ":" + minutes + ":" + seconds;
+
+    } else {
+        element.innerHTML = minutes + ":" + seconds;
+    }
+}
+
+function addLeadingZeros(value) {
+    return ("0" + value).slice(-2);
+}
+
+function showQRCode() {
+    var element = document.getElementById("lightningTipQR");
+
+    if (!element.hasChildNodes()) {
+        // Show the QR code
+        console.log("Showing QR code");
+
+        // QR code was not shown yet
+        if (qrCode == null) {
+            console.log("Creating QR code");
+
+            var size = document.getElementById("lightningTipInvoice").clientWidth;
+
+            var qr = qrcode(10, "L");
+
+            qr.addData(invoice);
+            qr.make();
+
+            qrCode = qr.createImgTag(size / 60, 6);
+        }
+
+        element.style.marginBottom = "1em";
+        element.innerHTML = qrCode;
+
+    } else {
+        // Hide the QR code
+        console.log("Hiding QR code");
+
+        element.style.marginBottom = "0";
+        element.innerHTML = "";
+
+    }
+
+}
+
+function copyToClipboard(element) {
+    element.select();
+
+    document.execCommand('copy');
+
+    console.log("Copied invoice to clipboard");
+}
+
 function showErrorMessage(message) {
+    running = false;
+
     console.error(message);
 
     var error = document.getElementById("lightningTipError");
 
     error.parentElement.style.marginTop = "0.5em";
-
     error.innerHTML = message;
+
+    document.getElementById("lightningTipGetInvoice").innerHTML = defaultGetInvoice;
 }
