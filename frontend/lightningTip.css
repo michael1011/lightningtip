@@ -115,6 +115,12 @@
     float: right;
 }
 
+#lightningTipThankYou {
+    margin-bottom: 0.2em;
+
+    display: block;
+}
+
 .spinner {
     width: 12px;
     height: 12px;

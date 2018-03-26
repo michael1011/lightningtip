@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
-	"fmt"
+	"github.com/donovanhide/eventsource"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -90,7 +90,7 @@ func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice 
 	return response.PaymentRequest, err
 }
 
-func (lnd *LND) SubscribeInvoices() error {
+func (lnd *LND) SubscribeInvoices(callback PublishInvoiceSettled, eventSrv *eventsource.Server) error {
 	stream, err := lnd.client.SubscribeInvoices(lnd.ctx, &lnrpc.InvoiceSubscription{})
 
 	if err != nil {
@@ -101,7 +101,7 @@ func (lnd *LND) SubscribeInvoices() error {
 
 	go func() {
 		for {
-			in, streamErr := stream.Recv()
+			invoice, streamErr := stream.Recv()
 
 			if streamErr == io.EOF {
 				err = errors.New("lost connection to LND gRPC")
@@ -119,8 +119,12 @@ func (lnd *LND) SubscribeInvoices() error {
 				return
 			}
 
-			fmt.Println(in)
+			if invoice.Settled {
+				callback(invoice.PaymentRequest, eventSrv)
+			}
+
 		}
+
 	}()
 
 	<-wait

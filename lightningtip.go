@@ -1,13 +1,34 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/donovanhide/eventsource"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
+
+const eventChannel = "invoiceSettled"
+
+var eventSrv *eventsource.Server
+
+var pendingInvoices []PendingInvoice
+
+type PendingInvoice struct {
+	Invoice string
+	Hash    string
+	Expiry  time.Time
+}
+
+// To use the pendingInvoice type as event for the EventSource stream
+func (pending PendingInvoice) Id() string    { return "" }
+func (pending PendingInvoice) Event() string { return "" }
+func (pending PendingInvoice) Data() string  { return pending.Hash }
 
 type invoiceResponse struct {
 	Invoice string
@@ -32,14 +53,18 @@ func main() {
 	err := backend.Connect()
 
 	if err == nil {
+		log.Info("Starting EventSource stream")
+
+		eventSrv = eventsource.NewServer()
+
 		http.HandleFunc("/", notFoundHandler)
 		http.HandleFunc("/getinvoice", getInvoiceHandler)
+		http.HandleFunc("/eventsource", eventSrv.Handler(eventChannel))
 
 		log.Info("Subscribing to invoices")
 
 		go func() {
-			// TODO: let clients listen if their invoice was paid (eventsource)
-			err = cfg.LND.SubscribeInvoices()
+			err = cfg.LND.SubscribeInvoices(publishInvoiceSettled, eventSrv)
 
 			if err != nil {
 				log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))
@@ -68,6 +93,23 @@ func main() {
 
 }
 
+// Callbacks when an invoice gets settled
+func publishInvoiceSettled(invoice string, eventSrv *eventsource.Server) {
+	for index, pending := range pendingInvoices {
+		if pending.Invoice == invoice {
+			log.Info("Invoice settled: " + invoice)
+
+			eventSrv.Publish([]string{eventChannel}, pending)
+
+			pendingInvoices = append(pendingInvoices[:index], pendingInvoices[index+1:]...)
+
+			break
+		}
+
+	}
+
+}
+
 func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 	errorMessage := "Could not parse values from request"
 
@@ -89,7 +131,21 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 						logMessage += " with message \"" + body.Message + "\""
 					}
 
+					sha := sha256.New()
+					sha.Write([]byte(invoice))
+
+					hash := hex.EncodeToString(sha.Sum(nil))
+
+					expiryDuration := time.Duration(cfg.TipExpiry) * time.Second
+
 					log.Info(logMessage)
+
+					// TODO: check every minute or so if expired
+					pendingInvoices = append(pendingInvoices, PendingInvoice{
+						Invoice: invoice,
+						Hash:    hash,
+						Expiry:  time.Now().Add(expiryDuration),
+					})
 
 					writer.Write(marshalJson(invoiceResponse{
 						Invoice: invoice,

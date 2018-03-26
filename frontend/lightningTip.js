@@ -11,7 +11,10 @@ var qrCode;
 
 var defaultGetInvoice;
 
-// TODO: listen to eventsource and show tank you when invoice settled
+// TODO: show error when invoice expires
+// TODO: maybe don't show full invoice
+// TODO: proper url handling window.location.protocol + window.location.hostname + ":8081/getinvoice"
+// TODO: show price in dollar?
 function getInvoice() {
     if (running === false) {
         running = true;
@@ -34,6 +37,16 @@ function getInvoice() {
                                 console.log("Got invoice: " + json.Invoice);
                                 console.log("Invoice expires in: " + json.Expiry);
 
+                                var hash = sha256(json.Invoice);
+
+                                console.log("Got hash of invoice: " + hash);
+
+                                // TODO: find alternative for Edge and IE
+                                console.log("Starting listening for invoice to get settled");
+
+                                listenInvoiceSettled(hash);
+
+                                // Update UI
                                 invoice = json.Invoice;
 
                                 var wrapper = document.getElementById("lightningTip");
@@ -65,6 +78,8 @@ function getInvoice() {
                             }
 
                         } catch (exception) {
+                            console.error(exception);
+
                             showErrorMessage("Failed to reach backend");
                         }
 
@@ -72,7 +87,6 @@ function getInvoice() {
 
                 };
 
-                // TODO: proper url handling window.location.protocol + window.location.hostname + ":8081/getinvoice"
                 request.open("POST", "http://localhost:8081/getinvoice", true);
                 request.send(data);
 
@@ -97,6 +111,19 @@ function getInvoice() {
         console.warn("Last request still pending");
     }
 
+}
+
+function listenInvoiceSettled(hash) {
+    var eventSrc = new EventSource("http://localhost:8081/eventsource");
+
+    eventSrc.onmessage = function (event) {
+        if (event.data === hash) {
+            var wrapper = document.getElementById("lightningTip");
+
+            wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
+            wrapper.innerHTML += "<a id='lightningTipThankYou'>Thank you for your tip!</a>";
+        }
+    };
 }
 
 function starTimer(duration, element) {

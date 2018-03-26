@@ -1,5 +1,10 @@
 package backends
 
+import "github.com/donovanhide/eventsource"
+
+// For callbacks when an invoice gets settled
+type PublishInvoiceSettled func(invoice string, eventSrv *eventsource.Server)
+
 type Backend interface {
 	Connect() error
 
