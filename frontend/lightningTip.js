@@ -144,20 +144,18 @@ function showQRCode() {
 
         // QR code was not shown yet
         if (qrCode == null) {
-            console.log("Creating QR code");
-
-            var size = document.getElementById("lightningTipInvoice").clientWidth;
-
-            var qr = qrcode(10, "L");
-
-            qr.addData(invoice);
-            qr.make();
-
-            qrCode = qr.createImgTag(size / 60, 6);
+            createQRCode(10);
         }
 
         element.style.marginBottom = "1em";
         element.innerHTML = qrCode;
+
+        var size = document.getElementById("lightningTipInvoice").clientWidth + "px";
+
+        var qrElement = element.children[0];
+
+        qrElement.style.height = size;
+        qrElement.style.width = size;
 
     } else {
         // Hide the QR code
@@ -168,6 +166,24 @@ function showQRCode() {
 
     }
 
+}
+
+function createQRCode(typeNumber) {
+    try {
+        console.log("Creating QR code with type number: " + typeNumber);
+
+        var qr = qrcode(typeNumber, "L");
+
+        qr.addData(invoice);
+        qr.make();
+
+        qrCode = qr.createImgTag(6, 6);
+
+    } catch (e) {
+        console.log("Overflow error. Trying bigger type number");
+
+        createQRCode(typeNumber + 1);
+    }
 }
 
 function copyToClipboard(element) {
@@ -188,5 +204,11 @@ function showErrorMessage(message) {
     error.parentElement.style.marginTop = "0.5em";
     error.innerHTML = message;
 
-    document.getElementById("lightningTipGetInvoice").innerHTML = defaultGetInvoice;
+    var button = document.getElementById("lightningTipGetInvoice");
+
+    // Only necessary if it has a child (div with class spinner)
+    if (button.children.length !== 0) {
+        button.innerHTML = defaultGetInvoice;
+    }
+
 }
