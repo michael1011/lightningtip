@@ -1,7 +1,4 @@
-function resizeInput(element) {
-    element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
-}
+var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
 
 // To prohibit multiple requests at the same time
 var running = false;
@@ -13,7 +10,6 @@ var defaultGetInvoice;
 
 // TODO: show error when invoice expires
 // TODO: maybe don't show full invoice
-// TODO: proper url handling window.location.protocol + window.location.hostname + ":8081/getinvoice"
 // TODO: show price in dollar?
 function getInvoice() {
     if (running === false) {
@@ -41,7 +37,6 @@ function getInvoice() {
 
                                 console.log("Got hash of invoice: " + hash);
 
-                                // TODO: find alternative for Edge and IE
                                 console.log("Starting listening for invoice to get settled");
 
                                 listenInvoiceSettled(hash);
@@ -87,7 +82,7 @@ function getInvoice() {
 
                 };
 
-                request.open("POST", "http://localhost:8081/getinvoice", true);
+                request.open("POST", requestUrl + "getinvoice", true);
                 request.send(data);
 
                 var button = document.getElementById("lightningTipGetInvoice");
@@ -114,16 +109,52 @@ function getInvoice() {
 }
 
 function listenInvoiceSettled(hash) {
-    var eventSrc = new EventSource("http://localhost:8081/eventsource");
+    if (EventSource === undefined) {
+        var eventSrc = new EventSource(requestUrl + "eventsource");
 
-    eventSrc.onmessage = function (event) {
-        if (event.data === hash) {
-            var wrapper = document.getElementById("lightningTip");
+        eventSrc.onmessage = function (event) {
+            if (event.data === hash) {
+                eventSrc.close();
 
-            wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
-            wrapper.innerHTML += "<a id='lightningTipThankYou'>Thank you for your tip!</a>";
-        }
-    };
+                showThankYouScreen();
+            }
+
+        };
+
+    } else {
+        console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice is settled");
+
+        var interval = setInterval(function () {
+            var request = new XMLHttpRequest();
+
+            request.onreadystatechange = function () {
+                if (request.readyState === 4 && request.status === 200) {
+                    var json = JSON.parse(request.responseText);
+
+                    if (json.Settled) {
+                        clearInterval(interval);
+
+                        showThankYouScreen();
+                    }
+
+                }
+
+            };
+
+            request.open("POST", requestUrl + "invoicesettled", true);
+            request.send(JSON.stringify({"InvoiceHash": hash}))
+
+        }, 2000);
+
+    }
+
+}
+
+function showThankYouScreen() {
+    var wrapper = document.getElementById("lightningTip");
+
+    wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
+    wrapper.innerHTML += "<a id='lightningTipThankYou'>Thank you for your tip!</a>";
 }
 
 function starTimer(duration, element) {
@@ -140,6 +171,7 @@ function starTimer(duration, element) {
         }
 
     }, 1000);
+
 }
 
 function showTimer(duration, element) {
@@ -156,6 +188,7 @@ function showTimer(duration, element) {
     } else {
         element.innerHTML = minutes + ":" + seconds;
     }
+
 }
 
 function addLeadingZeros(value) {
@@ -211,6 +244,7 @@ function createQRCode(typeNumber) {
 
         createQRCode(typeNumber + 1);
     }
+
 }
 
 function copyToClipboard(element) {
@@ -238,4 +272,9 @@ function showErrorMessage(message) {
         button.innerHTML = defaultGetInvoice;
     }
 
+}
+
+function resizeInput(element) {
+    element.style.height = "auto";
+    element.style.height = (element.scrollHeight) + "px";
 }

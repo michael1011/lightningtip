@@ -15,6 +15,8 @@ import (
 
 const eventChannel = "invoiceSettled"
 
+const couldNotParseError = "Could not parse values from request"
+
 var eventSrv *eventsource.Server
 
 var pendingInvoices []PendingInvoice
@@ -30,20 +32,29 @@ func (pending PendingInvoice) Id() string    { return "" }
 func (pending PendingInvoice) Event() string { return "" }
 func (pending PendingInvoice) Data() string  { return pending.Hash }
 
+type invoiceRequest struct {
+	Amount  int64
+	Message string
+}
+
 type invoiceResponse struct {
 	Invoice string
 	Expiry  int64
 }
 
-type invoiceRequest struct {
-	Amount  int64
-	Message string
+type invoiceSettledRequest struct {
+	InvoiceHash string
+}
+
+type invoiceSettledResponse struct {
+	Settled bool
 }
 
 type errorResponse struct {
 	Error string
 }
 
+// TODO: write how to build and install in README
 // TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
@@ -60,6 +71,9 @@ func main() {
 		http.HandleFunc("/", notFoundHandler)
 		http.HandleFunc("/getinvoice", getInvoiceHandler)
 		http.HandleFunc("/eventsource", eventSrv.Handler(eventChannel))
+
+		// Alternative for browsers which don't support EventSource (Internet Explorer and Edge)
+		http.HandleFunc("/invoicesettled", invoiceSettledHandler)
 
 		log.Info("Subscribing to invoices")
 
@@ -93,7 +107,7 @@ func main() {
 
 }
 
-// Callbacks when an invoice gets settled
+// Callback for backend
 func publishInvoiceSettled(invoice string, eventSrv *eventsource.Server) {
 	for index, pending := range pendingInvoices {
 		if pending.Invoice == invoice {
@@ -110,8 +124,48 @@ func publishInvoiceSettled(invoice string, eventSrv *eventsource.Server) {
 
 }
 
+func invoiceSettledHandler(writer http.ResponseWriter, request *http.Request) {
+	errorMessage := couldNotParseError
+
+	if request.Method == http.MethodPost {
+		var body invoiceSettledRequest
+
+		data, _ := ioutil.ReadAll(request.Body)
+
+		err := json.Unmarshal(data, &body)
+
+		if err == nil {
+			if body.InvoiceHash != "" {
+				settled := true
+
+				for _, pending := range pendingInvoices {
+					if pending.Hash == body.InvoiceHash {
+						settled = false
+
+						break
+					}
+
+				}
+
+				writer.Write(marshalJson(invoiceSettledResponse{
+					Settled: settled,
+				}))
+
+				return
+
+			}
+
+		}
+
+	}
+
+	log.Error(errorMessage)
+
+	writeError(writer, errorMessage)
+}
+
 func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
-	errorMessage := "Could not parse values from request"
+	errorMessage := couldNotParseError
 
 	if request.Method == http.MethodPost {
 		var body invoiceRequest
