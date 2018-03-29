@@ -14,9 +14,9 @@ import (
 )
 
 type LND struct {
-	RPCHost      string `long:"rpchost" Description:"Host that the gRPC interface of LND is listening to"`
-	CertFile     string `long:"certfile" Description:"TLS certificate for LND gRPC and REST services"`
-	MacaroonFile string `long:"macaroonfile" Description:"Admin macaroon file for LND authentication. Set to an empty string for no macaroon"`
+	GRPCHost     string `long:"grpchost" Description:"Host of the gRPC interface of LND"`
+	CertFile     string `long:"certfile" Description:"TLS certificate for the LND gRPC and REST services"`
+	MacaroonFile string `long:"macaroonfile" Description:"Admin macaroon file for authentication. Set to an empty string for no macaroon"`
 
 	client lnrpc.LightningClient
 	ctx    context.Context
@@ -31,7 +31,7 @@ func (lnd *LND) Connect() error {
 		return err
 	}
 
-	con, err := grpc.Dial(lnd.RPCHost, grpc.WithTransportCredentials(creds))
+	con, err := grpc.Dial(lnd.GRPCHost, grpc.WithTransportCredentials(creds))
 
 	if err != nil {
 		log.Error("Failed to connect to LND gRPC server")

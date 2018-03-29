@@ -21,18 +21,18 @@ const (
 
 	defaultTipExpiry = 3600
 
-	defaultLndRPCHost   = "localhost:10009"
+	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
 	defaultMacaroonFile = "admin.macaroon"
 )
 
 type config struct {
-	ConfigFile string `long:"config" Description:"Config file location"`
+	ConfigFile string `long:"config" Description:"Location of the config file"`
 
-	LogFile  string `long:"logfile" Description:"Log file location"`
+	LogFile  string `long:"logfile" Description:"Location of the log file"`
 	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
 
-	RESTHost     string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
+	RESTHost     string `long:"resthost" Description:"Host for the REST interface of LightningTip"`
 	AccessDomain string `long:"accessdomain" Description:"The domain you are using LightningTip from"`
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
@@ -59,7 +59,7 @@ func initConfig() {
 		TipExpiry: defaultTipExpiry,
 
 		LND: &backends.LND{
-			RPCHost:      defaultLndRPCHost,
+			GRPCHost:     defaultLndGRPCHost,
 			CertFile:     path.Join(lndDir, defaultLndCertFile),
 			MacaroonFile: path.Join(lndDir, defaultMacaroonFile),
 		},
