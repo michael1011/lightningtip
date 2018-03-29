@@ -9,7 +9,6 @@ var qrCode;
 
 var defaultGetInvoice;
 
-// TODO: show error when invoice expires
 // TODO: maybe don't show full invoice
 // TODO: show price in dollar?
 function getInvoice() {
@@ -110,11 +109,13 @@ function getInvoice() {
 }
 
 function listenInvoiceSettled(hash) {
-    if (EventSource !== undefined) {
+    try {
         var eventSrc = new EventSource(requestUrl + "eventsource");
 
         eventSrc.onmessage = function (event) {
             if (event.data === hash) {
+                console.log("Invoice settled");
+
                 eventSrc.close();
 
                 showThankYouScreen();
@@ -122,7 +123,8 @@ function listenInvoiceSettled(hash) {
 
         };
 
-    } else {
+    } catch (e) {
+        console.info(e);
         console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice is settled");
 
         var interval = setInterval(function () {
@@ -133,6 +135,8 @@ function listenInvoiceSettled(hash) {
                     var json = JSON.parse(request.responseText);
 
                     if (json.Settled) {
+                        console.log("Invoice settled");
+
                         clearInterval(interval);
 
                         showThankYouScreen();
