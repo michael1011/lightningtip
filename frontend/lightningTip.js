@@ -8,6 +8,14 @@ var qrCode;
 
 var defaultGetInvoice;
 
+// Fixes weird bug which moved the button up one pixel when its content was changed
+window.onload = function () {
+    var button = document.getElementById("lightningTipGetInvoice");
+
+    button.style.height = button.clientHeight + "px";
+    button.style.width = button.clientWidth + "px";
+};
+
 // TODO: maybe don't show full invoice
 // TODO: show price in dollar?
 function getInvoice() {
@@ -84,9 +92,6 @@ function getInvoice() {
                 request.send(data);
 
                 var button = document.getElementById("lightningTipGetInvoice");
-
-                button.style.height = button.clientHeight + "px";
-                button.style.width = button.clientWidth + "px";
 
                 defaultGetInvoice = button.innerHTML;
 
