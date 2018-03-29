@@ -16,7 +16,8 @@ const (
 	defaultLogFile  = "lightningTip.log"
 	defaultLogLevel = "debug"
 
-	defaultRESTHost = "localhost:8081"
+	defaultRESTHost     = "localhost:8081"
+	defaultAccessDomain = ""
 
 	defaultTipExpiry = 3600
 
@@ -31,7 +32,8 @@ type config struct {
 	LogFile  string `long:"logfile" Description:"Log file location"`
 	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
 
-	RESTHost string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
+	RESTHost     string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
+	AccessDomain string `long:"accessdomain" Description:"The domain you are using LightningTip from"`
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
 
@@ -51,7 +53,8 @@ func initConfig() {
 		LogFile:  defaultLogFile,
 		LogLevel: defaultLogLevel,
 
-		RESTHost: defaultRESTHost,
+		RESTHost:     defaultRESTHost,
+		AccessDomain: defaultAccessDomain,
 
 		TipExpiry: defaultTipExpiry,
 

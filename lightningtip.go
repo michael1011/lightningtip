@@ -68,12 +68,12 @@ func main() {
 
 		eventSrv = eventsource.NewServer()
 
-		http.HandleFunc("/", notFoundHandler)
-		http.HandleFunc("/getinvoice", getInvoiceHandler)
-		http.HandleFunc("/eventsource", eventSrv.Handler(eventChannel))
+		http.Handle("/", handleHeaders(notFoundHandler))
+		http.Handle("/getinvoice", handleHeaders(getInvoiceHandler))
+		http.Handle("/eventsource", handleHeaders(eventSrv.Handler(eventChannel)))
 
 		// Alternative for browsers which don't support EventSource (Internet Explorer and Edge)
-		http.HandleFunc("/invoicesettled", invoiceSettledHandler)
+		http.Handle("/invoicesettled", handleHeaders(invoiceSettledHandler))
 
 		log.Debug("Starting ticker to clear expired invoices")
 
@@ -253,6 +253,16 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
 	writeError(writer, "Not found")
+}
+
+func handleHeaders(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if cfg.AccessDomain != "" {
+			writer.Header().Add("Access-Control-Allow-Origin", cfg.AccessDomain)
+		}
+
+		handler(writer, request)
+	})
 }
 
 func writeError(writer http.ResponseWriter, message string) {
