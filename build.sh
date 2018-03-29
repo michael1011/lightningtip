@@ -1,3 +1,3 @@
 gofmt -s -w .
 
-go build -o lightningTip.
+go build -o lightningTip

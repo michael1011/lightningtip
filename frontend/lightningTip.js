@@ -1,5 +1,4 @@
-//var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
-var requestUrl = "http://localhost:8081/";
+var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
 
 // To prohibit multiple requests at the same time
 var running = false;
@@ -18,7 +17,6 @@ function getInvoice() {
         var tipValue = document.getElementById("lightningTipAmount");
 
         if (tipValue.value !== "") {
-
             if (!isNaN(tipValue.value)) {
                 var data = JSON.stringify({"Amount": parseInt(tipValue.value), "Message": document.getElementById("lightningTipMessage").value});
 

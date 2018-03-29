@@ -54,7 +54,6 @@ type errorResponse struct {
 	Error string
 }
 
-// TODO: write how to build and install in README
 // TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
