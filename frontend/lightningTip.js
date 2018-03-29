@@ -1,4 +1,5 @@
-var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
+//var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
+var requestUrl = "http://localhost:8081/";
 
 // To prohibit multiple requests at the same time
 var running = false;
@@ -109,7 +110,7 @@ function getInvoice() {
 }
 
 function listenInvoiceSettled(hash) {
-    if (EventSource === undefined) {
+    if (EventSource !== undefined) {
         var eventSrc = new EventSource(requestUrl + "eventsource");
 
         eventSrc.onmessage = function (event) {
@@ -154,19 +155,21 @@ function showThankYouScreen() {
     var wrapper = document.getElementById("lightningTip");
 
     wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
-    wrapper.innerHTML += "<a id='lightningTipThankYou'>Thank you for your tip!</a>";
+    wrapper.innerHTML += "<a id='lightningTipFinished'>Thank you for your tip!</a>";
 }
 
 function starTimer(duration, element) {
     showTimer(duration, element);
 
     var interval = setInterval(function () {
-        if (duration > 0) {
+        if (duration > 1) {
             duration--;
 
             showTimer(duration, element);
 
         } else {
+            showExpired();
+
             clearInterval(interval);
         }
 
@@ -189,6 +192,13 @@ function showTimer(duration, element) {
         element.innerHTML = minutes + ":" + seconds;
     }
 
+}
+
+function showExpired() {
+    var wrapper = document.getElementById("lightningTip");
+
+    wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
+    wrapper.innerHTML += "<a id='lightningTipFinished'>Your invoice expired!</a>";
 }
 
 function addLeadingZeros(value) {

@@ -33,7 +33,7 @@ type config struct {
 
 	RESTHost string `long:"resthost" Description:"Host for the rest interface of LightningTip"`
 
-	TipExpiry int64 `long:"tipexpiry" Description:"Expiry time in seconds"`
+	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }

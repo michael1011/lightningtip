@@ -75,6 +75,35 @@ func main() {
 		// Alternative for browsers which don't support EventSource (Internet Explorer and Edge)
 		http.HandleFunc("/invoicesettled", invoiceSettledHandler)
 
+		log.Debug("Starting ticker to clear expired invoices")
+
+		// A bit longer than the expiry time to make sure the invoice doesn't show as settled if it isn't (affects just invoiceSettledHandler)
+		duration := time.Duration(cfg.TipExpiry + 10)
+		ticker := time.Tick(duration * time.Second)
+
+		go func() {
+			for {
+				select {
+				case <-ticker:
+					now := time.Now()
+
+					for index := len(pendingInvoices) - 1; index >= 0; index-- {
+						invoice := pendingInvoices[index]
+
+						if now.Sub(invoice.Expiry) > 0 {
+							log.Debug("Invoice expired: " + invoice.Invoice)
+
+							pendingInvoices = append(pendingInvoices[:index], pendingInvoices[index+1:]...)
+						}
+
+					}
+
+				}
+
+			}
+
+		}()
+
 		log.Info("Subscribing to invoices")
 
 		go func() {
@@ -194,7 +223,6 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 					log.Info(logMessage)
 
-					// TODO: check every minute or so if expired
 					pendingInvoices = append(pendingInvoices, PendingInvoice{
 						Invoice: invoice,
 						Hash:    hash,
