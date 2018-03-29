@@ -14,10 +14,11 @@ var defaultGetInvoice;
 window.onload = function () {
     var button = document.getElementById("lightningTipGetInvoice");
 
-    button.style.height = button.clientHeight + "px";
-    button.style.width = button.clientWidth + "px";
+    button.style.height = (button.clientHeight + 1) + "px";
+    button.style.width = (button.clientWidth + 1) + "px";
 };
 
+// TODO: fix scaling on phones
 // TODO: maybe don't show full invoice
 // TODO: show price in dollar?
 function getInvoice() {
@@ -54,7 +55,7 @@ function getInvoice() {
 
                                 var wrapper = document.getElementById("lightningTip");
 
-                                wrapper.innerHTML = "<a>Your invoice</a>";
+                                wrapper.innerHTML = "<a>Your tip request</a>";
                                 wrapper.innerHTML += "<textarea class='lightningTipInput' id='lightningTipInvoice' onclick='copyToClipboard(this)' readonly>" + json.Invoice + "</textarea>";
                                 wrapper.innerHTML += "<div id='lightningTipQR'></div>";
 
@@ -207,7 +208,7 @@ function showExpired() {
     var wrapper = document.getElementById("lightningTip");
 
     wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
-    wrapper.innerHTML += "<a id='lightningTipFinished'>Your invoice expired!</a>";
+    wrapper.innerHTML += "<a id='lightningTipFinished'>Your tip request expired!</a>";
 }
 
 function addLeadingZeros(value) {
