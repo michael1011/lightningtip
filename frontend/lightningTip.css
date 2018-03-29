@@ -36,6 +36,10 @@
     cursor: pointer;
 }
 
+.lightningTipButton:focus {
+    outline: none;
+}
+
 #lightningTip {
     width: 12em;
 
