@@ -25,8 +25,8 @@ That's it! The only two things you need to take care about is keeping the LND no
 First of all make sure [Golang](https://golang.org/) and [Dep](https://github.com/golang/dep) are both correctly installed. Golang version 1.10 or newer is recommended.
 
 ```
-go get github.com/michael1011/lightningtip.git
-cd $GOPATH/src/github.com/michael1011/lightningtip.git
+go get github.com/michael1011/lightningtip
+cd $GOPATH/src/github.com/michael1011/lightningtip
 dep ensure
 go install
 ```
