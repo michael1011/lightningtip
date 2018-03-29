@@ -54,7 +54,7 @@ function getInvoice() {
 
                                 var wrapper = document.getElementById("lightningTip");
 
-                                wrapper.innerHTML = "<a>Your invoice</a>";
+                                wrapper.innerHTML = "<a>Your tip request</a>";
                                 wrapper.innerHTML += "<textarea class='lightningTipInput' id='lightningTipInvoice' onclick='copyToClipboard(this)' readonly>" + json.Invoice + "</textarea>";
                                 wrapper.innerHTML += "<div id='lightningTipQR'></div>";
 
@@ -207,7 +207,7 @@ function showExpired() {
     var wrapper = document.getElementById("lightningTip");
 
     wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
-    wrapper.innerHTML += "<a id='lightningTipFinished'>Your invoice expired!</a>";
+    wrapper.innerHTML += "<a id='lightningTipFinished'>Your tip request expired!</a>";
 }
 
 function addLeadingZeros(value) {
