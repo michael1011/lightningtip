@@ -40,6 +40,12 @@
     outline: none;
 }
 
+.lightningTipButton::-moz-focus-inner {
+    outline: none;
+
+    border: 0;
+}
+
 #lightningTip {
     width: 12em;
 

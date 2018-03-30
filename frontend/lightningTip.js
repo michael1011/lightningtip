@@ -14,10 +14,11 @@ var defaultGetInvoice;
 window.onload = function () {
     var button = document.getElementById("lightningTipGetInvoice");
 
-    button.style.height = button.clientHeight + "px";
-    button.style.width = button.clientWidth + "px";
+    button.style.height = (button.clientHeight + 1) + "px";
+    button.style.width = (button.clientWidth + 1) + "px";
 };
 
+// TODO: fix scaling on phones
 // TODO: maybe don't show full invoice
 // TODO: show price in dollar?
 function getInvoice() {

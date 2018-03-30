@@ -119,7 +119,14 @@ func main() {
 		log.Info("Starting HTTP server")
 
 		go func() {
-			err = http.ListenAndServe(cfg.RESTHost, nil)
+			var err error
+
+			if cfg.TlsCertFile != "" && cfg.TlsKeyFile != "" {
+				err = http.ListenAndServeTLS(cfg.RESTHost, cfg.TlsCertFile, cfg.TlsKeyFile, nil)
+
+			} else {
+				err = http.ListenAndServe(cfg.RESTHost, nil)
+			}
 
 			if err != nil {
 				log.Error("Failed to start HTTP server: " + fmt.Sprint(err))
