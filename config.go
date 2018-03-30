@@ -16,7 +16,10 @@ const (
 	defaultLogFile  = "lightningTip.log"
 	defaultLogLevel = "debug"
 
-	defaultRESTHost     = "localhost:8081"
+	defaultRESTHost    = "0.0.0.0:8081"
+	defaultTlsCertFile = ""
+	defaultTlsKeyFile  = ""
+
 	defaultAccessDomain = ""
 
 	defaultTipExpiry = 3600
@@ -32,7 +35,10 @@ type config struct {
 	LogFile  string `long:"logfile" Description:"Location of the log file"`
 	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
 
-	RESTHost     string `long:"resthost" Description:"Host for the REST interface of LightningTip"`
+	RESTHost    string `long:"resthost" Description:"Host for the REST interface of LightningTip"`
+	TlsCertFile string `long:"tlscertfile" Description:"Certificate for using LightningTip via HTTPS"`
+	TlsKeyFile  string `long:"tlskeyfile" Description:"Certificate for using LightningTip via HTTPS"`
+
 	AccessDomain string `long:"accessdomain" Description:"The domain you are using LightningTip from"`
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
@@ -53,7 +59,10 @@ func initConfig() {
 		LogFile:  defaultLogFile,
 		LogLevel: defaultLogLevel,
 
-		RESTHost:     defaultRESTHost,
+		RESTHost:    defaultRESTHost,
+		TlsCertFile: defaultTlsCertFile,
+		TlsKeyFile:  defaultTlsKeyFile,
+
 		AccessDomain: defaultAccessDomain,
 
 		TipExpiry: defaultTipExpiry,
@@ -65,12 +74,13 @@ func initConfig() {
 		},
 	}
 
-	_, err := flags.Parse(&cfg)
+	// Ignore unknown flags the first time parsing command line flags to prevent showing the unknown flag error twice
+	flags.NewParser(&cfg, flags.IgnoreUnknown).Parse()
 
 	errFile := flags.IniParse(cfg.ConfigFile, &cfg)
 
 	// Parse flags again to override config file
-	_, err = flags.Parse(&cfg)
+	_, err := flags.Parse(&cfg)
 
 	// Default log level
 	logLevel := logging.DEBUG
