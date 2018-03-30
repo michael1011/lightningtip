@@ -10,6 +10,7 @@ var qrCode;
 
 var defaultGetInvoice;
 
+// TODO: solve this without JavaScript
 // Fixes weird bug which moved the button up one pixel when its content was changed
 window.onload = function () {
     var button = document.getElementById("lightningTipGetInvoice");
@@ -19,7 +20,7 @@ window.onload = function () {
 };
 
 // TODO: fix scaling on phones
-// TODO: maybe don't show full invoice
+// TODO: optimize creating bigger QR codes
 // TODO: show price in dollar?
 function getInvoice() {
     if (running === false) {
@@ -50,26 +51,29 @@ function getInvoice() {
 
                                 listenInvoiceSettled(hash);
 
-                                // Update UI
                                 invoice = json.Invoice;
 
+                                // Update UI
                                 var wrapper = document.getElementById("lightningTip");
 
                                 wrapper.innerHTML = "<a>Your tip request</a>";
-                                wrapper.innerHTML += "<textarea class='lightningTipInput' id='lightningTipInvoice' onclick='copyToClipboard(this)' readonly>" + json.Invoice + "</textarea>";
+                                wrapper.innerHTML += "<input type='text' class='lightningTipInput' id='lightningTipInvoice' onclick='copyInvoiceToClipboard()' value='" + invoice + "' readonly>";
                                 wrapper.innerHTML += "<div id='lightningTipQR'></div>";
 
                                 resizeInput(document.getElementById("lightningTipInvoice"));
 
+                                showQRCode();
+
                                 wrapper.innerHTML += "<div id='lightningTipTools'>" +
-                                    "<button class='lightningTipButton' id='lightningTipGetQR' onclick='showQRCode()'>QR</button>" +
+                                    "<button class='lightningTipButton' id='lightningTipCopy' onclick='copyInvoiceToClipboard()'>Copy</button>" +
                                     "<button class='lightningTipButton' id='lightningTipOpen'>Open</button>" +
                                     "<a id='lightningTipExpiry'></a>" +
                                     "</div>";
 
                                 starTimer(json.Expiry, document.getElementById("lightningTipExpiry"));
 
-                                document.getElementById("lightningTipTools").style.height = document.getElementById("lightningTipGetQR").clientHeight + "px";
+                                // Fixes bug which caused the content of #lightningTipTools to be visually outside of #lightningTip
+                                document.getElementById("lightningTipTools").style.height = document.getElementById("lightningTipCopy").clientHeight + "px";
 
                                 document.getElementById("lightningTipOpen").onclick = function () {
                                     location.href = "lightning:" + json.Invoice;
@@ -130,7 +134,7 @@ function listenInvoiceSettled(hash) {
         };
 
     } catch (e) {
-        console.info(e);
+        console.error(e);
         console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice is settled");
 
         var interval = setInterval(function () {
@@ -227,7 +231,7 @@ function showQRCode() {
             createQRCode(10);
         }
 
-        element.style.marginBottom = "1em";
+        element.style.marginBottom = "0.8em";
         element.innerHTML = qrCode;
 
         var size = document.getElementById("lightningTipInvoice").clientWidth + "px";
@@ -267,7 +271,9 @@ function createQRCode(typeNumber) {
 
 }
 
-function copyToClipboard(element) {
+function copyInvoiceToClipboard() {
+    var element = document.getElementById("lightningTipInvoice");
+
     element.select();
 
     document.execCommand('copy');
@@ -296,5 +302,9 @@ function showErrorMessage(message) {
 
 function resizeInput(element) {
     element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
+
+    // Change the size only if
+    if (element.clientHeight !== element.scrollHeight) {
+        element.style.height = (element.scrollHeight) + "px";
+    }
 }

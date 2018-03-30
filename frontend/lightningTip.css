@@ -1,3 +1,4 @@
+/* TODO: add light theme */
 .lightningTipInput {
     width: 100%;
 
@@ -95,15 +96,15 @@
 }
 
 #lightningTipInvoice {
-    margin-top: 0.6em;
-    margin-bottom: 1em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
 
 #lightningTipTools {
     height: 100px;
 }
 
-#lightningTipGetQR {
+#lightningTipCopy {
     border-right: 1px solid #F5F5F5;
 
     border-top-right-radius: 0;
