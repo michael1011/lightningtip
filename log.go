@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/op/go-logging"
 	"os"
 )
@@ -17,13 +16,11 @@ func initLog() {
 	logging.SetBackend(backendConsole)
 }
 
-func initLogFile(logFile string, level logging.Level) {
+func initLogger(logFile string, level logging.Level) error {
 	file, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
 
 	if err != nil {
-		log.Error("Failed to initialize log file: " + fmt.Sprint(err))
-
-		return
+		return err
 	}
 
 	backendFile := logging.NewLogBackend(file, "", 0)
@@ -36,5 +33,5 @@ func initLogFile(logFile string, level logging.Level) {
 
 	logging.SetBackend(backendConsoleLeveled, backendFileLeveled)
 
-	log.Debug("Successfully initialized log file")
+	return nil
 }

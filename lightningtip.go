@@ -54,6 +54,7 @@ type errorResponse struct {
 	Error string
 }
 
+// TODO: add setup guide for systemd
 // TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
@@ -121,15 +122,15 @@ func main() {
 		go func() {
 			var err error
 
-			if cfg.TlsCertFile != "" && cfg.TlsKeyFile != "" {
-				err = http.ListenAndServeTLS(cfg.RESTHost, cfg.TlsCertFile, cfg.TlsKeyFile, nil)
+			if cfg.TLSCertFile != "" && cfg.TLSKeyFile != "" {
+				err = http.ListenAndServeTLS(cfg.RESTHost, cfg.TLSCertFile, cfg.TLSKeyFile, nil)
 
 			} else {
 				err = http.ListenAndServe(cfg.RESTHost, nil)
 			}
 
 			if err != nil {
-				log.Error("Failed to start HTTP server: " + fmt.Sprint(err))
+				log.Errorf("Failed to start HTTP server: " + fmt.Sprint(err))
 
 				os.Exit(1)
 			}
