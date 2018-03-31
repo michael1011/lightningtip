@@ -107,7 +107,7 @@ func main() {
 		log.Info("Subscribing to invoices")
 
 		go func() {
-			err = cfg.LND.SubscribeInvoices(publishInvoiceSettled, eventSrv)
+			err = backend.SubscribeInvoices(publishInvoiceSettled, eventSrv)
 
 			if err != nil {
 				log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))

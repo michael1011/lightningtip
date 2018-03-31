@@ -140,6 +140,8 @@ func initConfig() {
 		log.Debug("Initialized log file: " + cfg.LogFile)
 	}
 
+	backends.UseLogger(*log)
+
 	// TODO: add more backend options like for example c-lighting and eclair
 	backend = cfg.LND
 }

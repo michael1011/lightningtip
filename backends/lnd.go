@@ -56,16 +56,6 @@ func (lnd *LND) Connect() error {
 	return err
 }
 
-func getMacaroon(macaroonFile string) (macaroon metadata.MD, err error) {
-	data, err := ioutil.ReadFile(macaroonFile)
-
-	if err == nil {
-		macaroon = metadata.Pairs("macaroon", hex.EncodeToString(data))
-	}
-
-	return macaroon, err
-}
-
 func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
@@ -130,4 +120,14 @@ func (lnd *LND) SubscribeInvoices(callback PublishInvoiceSettled, eventSrv *even
 	<-wait
 
 	return err
+}
+
+func getMacaroon(macaroonFile string) (macaroon metadata.MD, err error) {
+	data, err := ioutil.ReadFile(macaroonFile)
+
+	if err == nil {
+		macaroon = metadata.Pairs("macaroon", hex.EncodeToString(data))
+	}
+
+	return macaroon, err
 }
