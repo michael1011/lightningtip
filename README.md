@@ -42,7 +42,7 @@ go install
 LightningTip can be started automatically via Systemd, or Supervisord, as outlined in the following wiki documentation:
 
 * [Running LightningTip with systemd](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-with-systemd)
-* [Running LightningTip service with supervisord](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-service-with-supervisord)
+* [Running LightningTip with supervisord](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-with-supervisord)
 
 ## Reverse Proxy Recipes
 
