@@ -16,7 +16,7 @@ The default config file location is `lightningTip.conf` in the directory you are
 Embedding LightningTip is also quite easy. Upload all files excluding `lightningTip.html` to your webserver. Copy the contents of the head tag of the before mentioned HTML file into a HTML file you want to show LightningTip in. The div below the head tag is LightningTip itself. Paste it into any place in the already edited HTML file on you server.
 
 
-Make sure that the executable of **LightningTip is always running** in the background. It connects LND and the widget on your website. A sample configuration for systemd can be found [on this wiki page](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-with-systemd).
+Make sure that the executable of **LightningTip is always running** in the background. It connects LND and the widget on your website.
 
 
 If you are not running LightningTip on the same domain or IP address as your webserver or not on port 8081 change the variable `requestUrl` (which is in the first line) in the file `lightningTip.js` accordingly.
