@@ -36,3 +36,19 @@ cd $GOPATH/src/github.com/michael1011/lightningtip
 dep ensure
 go install
 ```
+
+## Starting LightningTip Automatically
+
+LightningTip can be started automatically via Systemd, or Supervisord, as outlined in the following wiki documentation:
+
+* [Running LightningTip with systemd](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-with-systemd)
+* [Running LightningTip service with supervisord](https://github.com/michael1011/lightningtip/wiki/Running-LightningTip-service-with-supervisord)
+
+## Reverse Proxy Recipes
+
+In instances where the default LightningTip SSL configuration options are not working, you may want to explore running a reverse proxy to LightningTip as outlined in the following wiki documentation:
+
+* [LightningTip via Apache2 reverse proxy](https://github.com/michael1011/lightningtip/wiki/LightningTip-via-Apache2-reverse-proxy)
+* [LightningTip via Nginx reverse proxy](https://github.com/michael1011/lightningtip/wiki/LightningTip-via-Nginx-reverse-proxy)
+
+
