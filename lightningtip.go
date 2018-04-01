@@ -213,7 +213,6 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 			if body.Amount != 0 {
 				invoice, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
 
-				// TODO: handle too long messages better
 				if err == nil {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
 
@@ -245,6 +244,13 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 				} else {
 					errorMessage = "Failed to create invoice"
+
+					// This is way to hacky
+					// Maybe a cast to the gRPC error and get its error message directly
+					if fmt.Sprint(err)[:47] == "rpc error: code = Unknown desc = memo too large" {
+						errorMessage += ": message too long"
+					}
+
 				}
 
 			}

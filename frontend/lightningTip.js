@@ -40,11 +40,12 @@ window.onload = function () {
 
     button.style.height = (button.clientHeight + 1) + "px";
     button.style.width = (button.clientWidth + 1) + "px";
+
+    resizeInput(document.getElementById("lightningTipMessage"))
 };
 
 // TODO: show invoice even if JavaScript is disabled
 // TODO: fix scaling on phones
-// TODO: optimize creating bigger QR codes
 // TODO: show price in dollar?
 function getInvoice() {
     if (running === false) {
@@ -320,6 +321,6 @@ function resizeInput(element) {
 
     // Change the size only if
     if (element.clientHeight !== element.scrollHeight) {
-        element.style.height = (element.scrollHeight) + "px";
+        element.style.height = element.scrollHeight + "px";
     }
 }

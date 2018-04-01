@@ -59,19 +59,11 @@ func (lnd *LND) Connect() error {
 func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
-	if message != "" {
-		response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
-			Memo:   message,
-			Value:  amount,
-			Expiry: expiry,
-		})
-
-	} else {
-		response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
-			Value:  amount,
-			Expiry: expiry,
-		})
-	}
+	response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
+		Memo:   message,
+		Value:  amount,
+		Expiry: expiry,
+	})
 
 	if err != nil {
 		return "", err

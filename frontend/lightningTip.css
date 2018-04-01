@@ -1,4 +1,21 @@
 /* TODO: add light theme */
+#lightningTip {
+    width: 12em;
+
+    padding: 1em;
+
+    background-color: #212121;
+
+    border-radius: 4px;
+
+    color: #F5F5F5;
+
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+
+    text-align: center;
+}
+
 .lightningTipInput {
     width: 100%;
 
@@ -45,23 +62,6 @@
     outline: none;
 
     border: 0;
-}
-
-#lightningTip {
-    width: 12em;
-
-    padding: 1em;
-
-    background-color: #212121;
-
-    border-radius: 4px;
-
-    color: #F5F5F5;
-
-    font-size: 20px;
-    font-family: Arial, Helvetica, sans-serif;
-
-    text-align: center;
 }
 
 #lightningTipLogo {
