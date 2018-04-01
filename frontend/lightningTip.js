@@ -40,8 +40,6 @@ window.onload = function () {
 
     button.style.height = (button.clientHeight + 1) + "px";
     button.style.width = (button.clientWidth + 1) + "px";
-
-    resizeInput(document.getElementById("lightningTipMessage"))
 };
 
 // TODO: show invoice even if JavaScript is disabled
@@ -315,12 +313,9 @@ function showErrorMessage(message) {
 
 }
 
-// TODO: better way scaling
-function resizeInput(element) {
-    element.style.height = "auto";
-
-    // Change the size only if
-    if (element.clientHeight !== element.scrollHeight) {
-        element.style.height = element.scrollHeight + "px";
+function divRestorePlaceholder(element) {
+    // <br> means that there is no user input
+    if (element.innerHTML === "<br>") {
+        element.innerHTML = "";
     }
 }

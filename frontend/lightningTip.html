@@ -15,7 +15,7 @@
     <div id="lightningTipInputs">
         <input type="number" class="lightningTipInput" id="lightningTipAmount" placeholder="Amount in satoshi">
         <br>
-        <textarea class="lightningTipInput" id="lightningTipMessage" placeholder="A message you want to add" oninput="resizeInput(this)"></textarea>
+        <div class="lightningTipInput" id="lightningTipMessage" placeholder="A message you want to add" oninput="divRestorePlaceholder(this)" onblur="divRestorePlaceholder(this)" contenteditable></div>
 
         <button class="lightningTipButton" id="lightningTipGetInvoice" onclick="getInvoice()">Get request</button>
 

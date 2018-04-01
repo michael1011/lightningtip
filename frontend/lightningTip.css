@@ -78,11 +78,21 @@
 #lightningTipMessage {
     min-height: 55px;
 
-    font-family: Arial, Helvetica, sans-serif;
-
     margin-top: 0.5em;
-
     padding: 8px 10px;
+
+    display: inline-block;
+    box-sizing: border-box;
+
+    text-align: left;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hack for using placeholders on divs */
+#lightningTipMessage:empty:before {
+    content: attr(placeholder);
+    color: gray;
 }
 
 #lightningTipGetInvoice {
