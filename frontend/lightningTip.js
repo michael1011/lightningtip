@@ -10,6 +10,29 @@ var qrCode;
 
 var defaultGetInvoice;
 
+// Data capacities for QR codes with mode byte and error correction level L (7%)
+// Shortest invoice: 194 characters
+// Longest invoice: 1223 characters (as far as I know)
+var qrCodeDataCapacities = [
+    {"typeNumber": 9, "capacity": 230},
+    {"typeNumber": 10, "capacity": 271},
+    {"typeNumber": 11, "capacity": 321},
+    {"typeNumber": 12, "capacity": 367},
+    {"typeNumber": 13, "capacity": 425},
+    {"typeNumber": 14, "capacity": 458},
+    {"typeNumber": 15, "capacity": 520},
+    {"typeNumber": 16, "capacity": 586},
+    {"typeNumber": 17, "capacity": 644},
+    {"typeNumber": 18, "capacity": 718},
+    {"typeNumber": 19, "capacity": 792},
+    {"typeNumber": 20, "capacity": 858},
+    {"typeNumber": 21, "capacity": 929},
+    {"typeNumber": 22, "capacity": 1003},
+    {"typeNumber": 23, "capacity": 1091},
+    {"typeNumber": 24, "capacity": 1171},
+    {"typeNumber": 25, "capacity": 1273}
+];
+
 // TODO: solve this without JavaScript
 // Fixes weird bug which moved the button up one pixel when its content was changed
 window.onload = function () {
@@ -19,6 +42,7 @@ window.onload = function () {
     button.style.width = (button.clientWidth + 1) + "px";
 };
 
+// TODO: show invoice even if JavaScript is disabled
 // TODO: fix scaling on phones
 // TODO: optimize creating bigger QR codes
 // TODO: show price in dollar?
@@ -62,8 +86,6 @@ function getInvoice() {
 
                                 resizeInput(document.getElementById("lightningTipInvoice"));
 
-                                showQRCode();
-
                                 wrapper.innerHTML += "<div id='lightningTipTools'>" +
                                     "<button class='lightningTipButton' id='lightningTipCopy' onclick='copyInvoiceToClipboard()'>Copy</button>" +
                                     "<button class='lightningTipButton' id='lightningTipOpen'>Open</button>" +
@@ -78,6 +100,8 @@ function getInvoice() {
                                 document.getElementById("lightningTipOpen").onclick = function () {
                                     location.href = "lightning:" + json.Invoice;
                                 };
+
+                                showQRCode();
 
                                 running = false;
 
@@ -222,53 +246,43 @@ function addLeadingZeros(value) {
 function showQRCode() {
     var element = document.getElementById("lightningTipQR");
 
-    if (!element.hasChildNodes()) {
-        // Show the QR code
-        console.log("Showing QR code");
+    createQRCode();
 
-        // QR code was not shown yet
-        if (qrCode == null) {
-            createQRCode(10);
-        }
+    element.innerHTML = qrCode;
 
-        element.style.marginBottom = "0.8em";
-        element.innerHTML = qrCode;
+    var size = document.getElementById("lightningTipInvoice").clientWidth + "px";
 
-        var size = document.getElementById("lightningTipInvoice").clientWidth + "px";
+    var qrElement = element.children[0];
 
-        var qrElement = element.children[0];
-
-        qrElement.style.height = size;
-        qrElement.style.width = size;
-
-    } else {
-        // Hide the QR code
-        console.log("Hiding QR code");
-
-        element.style.marginBottom = "0";
-        element.innerHTML = "";
-
-    }
-
+    qrElement.style.height = size;
+    qrElement.style.width = size;
 }
 
-function createQRCode(typeNumber) {
-    try {
-        console.log("Creating QR code with type number: " + typeNumber);
+function createQRCode() {
+    var invoiceLength = invoice.length;
 
-        var qr = qrcode(typeNumber, "L");
+    // Just in case an invoice bigger than expected gets created
+    var typeNumber = 26;
 
-        qr.addData(invoice);
-        qr.make();
+    for (var i = 0; i < qrCodeDataCapacities.length; i++) {
+        var dataCapacity = qrCodeDataCapacities[i];
 
-        qrCode = qr.createImgTag(6, 6);
+        if (invoiceLength < dataCapacity.capacity) {
+            typeNumber = dataCapacity.typeNumber;
 
-    } catch (e) {
-        console.log("Overflow error. Trying bigger type number");
+            break;
+        }
 
-        createQRCode(typeNumber + 1);
     }
 
+    console.log("Creating QR code with type number: " + typeNumber);
+
+    var qr = qrcode(typeNumber, "L");
+
+    qr.addData(invoice);
+    qr.make();
+
+    qrCode = qr.createImgTag(6, 6);
 }
 
 function copyInvoiceToClipboard() {
@@ -300,6 +314,7 @@ function showErrorMessage(message) {
 
 }
 
+// TODO: better way scaling
 function resizeInput(element) {
     element.style.height = "auto";
 

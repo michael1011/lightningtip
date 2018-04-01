@@ -54,7 +54,6 @@ type errorResponse struct {
 	Error string
 }
 
-// TODO: add setup guide for systemd
 // TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
@@ -214,6 +213,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 			if body.Amount != 0 {
 				invoice, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
 
+				// TODO: handle too long messages better
 				if err == nil {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
 
