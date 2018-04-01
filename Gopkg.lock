@@ -30,8 +30,8 @@
 [[projects]]
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
-  revision = "96dc06278ce32a0e9d957d590bb987c81ee66407"
-  version = "v1.3.0"
+  revision = "c6ca198ec95c841fdb89fc0de7496fed11ab854e"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/lightningnetwork/lnd"
@@ -111,6 +111,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6f6399de5cf318f2f0c9332a08fde959dcceb2d4129a71d0576ce02df118d201"
+  inputs-digest = "893dbfd280cd502dd2f2e998c612c04aeb6b6e754c0c2692b320d6545314b4b8"
   solver-name = "gps-cdcl"
   solver-version = 1
