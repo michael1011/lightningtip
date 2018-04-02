@@ -53,7 +53,7 @@ function getInvoice() {
 
         if (tipValue.value !== "") {
             if (!isNaN(tipValue.value)) {
-                var data = JSON.stringify({"Amount": parseInt(tipValue.value), "Message": document.getElementById("lightningTipMessage").value});
+                var data = JSON.stringify({"Amount": parseInt(tipValue.value), "Message": document.getElementById("lightningTipMessage").innerText});
 
                 var request = new XMLHttpRequest();
 
@@ -312,8 +312,8 @@ function showErrorMessage(message) {
 }
 
 function divRestorePlaceholder(element) {
-    // <br> means that there is no user input
-    if (element.innerHTML === "<br>") {
+    // <br> and <div><br></div> mean that there is no user input
+    if (element.innerHTML === "<br>" || element.innerHTML === "<div><br></div>") {
         element.innerHTML = "";
     }
 }

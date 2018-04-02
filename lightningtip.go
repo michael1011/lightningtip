@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -217,6 +218,11 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
 
 					if body.Message != "" {
+						// Clear new lines at the end of the messages
+						if strings.HasSuffix(body.Message, "\n") {
+							body.Message = strings.TrimSuffix(body.Message, "\n")
+						}
+
 						logMessage += " with message \"" + body.Message + "\""
 					}
 
