@@ -83,8 +83,6 @@ function getInvoice() {
                                 wrapper.innerHTML += "<input type='text' class='lightningTipInput' id='lightningTipInvoice' onclick='copyInvoiceToClipboard()' value='" + invoice + "' readonly>";
                                 wrapper.innerHTML += "<div id='lightningTipQR'></div>";
 
-                                resizeInput(document.getElementById("lightningTipInvoice"));
-
                                 wrapper.innerHTML += "<div id='lightningTipTools'>" +
                                     "<button class='lightningTipButton' id='lightningTipCopy' onclick='copyInvoiceToClipboard()'>Copy</button>" +
                                     "<button class='lightningTipButton' id='lightningTipOpen'>Open</button>" +
