@@ -30,7 +30,7 @@ const (
 
 	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
-	defaultMacaroonFile = "admin.macaroon"
+	defaultMacaroonFile = "invoice.macaroon"
 )
 
 type config struct {
