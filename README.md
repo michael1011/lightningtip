@@ -30,7 +30,7 @@ dep ensure
 go install
 ```
 
-To start run `$GOPATH/bin/lightningtip` to follow the instructions below to setup a service to run LightningTip automatically.
+To start run `$GOPATH/bin/lightningtip` or follow the instructions below to setup a service to run LightningTip automatically.
 
 ## Upgrading
 Make sure you stop any running LightningTip process before upgrading, then pull from source as follows:
