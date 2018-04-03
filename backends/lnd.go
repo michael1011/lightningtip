@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
-	"github.com/donovanhide/eventsource"
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -56,7 +55,7 @@ func (lnd *LND) Connect() error {
 	return err
 }
 
-func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, err error) {
+func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, paymentHash []byte, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
 	response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
@@ -66,13 +65,29 @@ func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice 
 	})
 
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return response.PaymentRequest, err
+	return response.PaymentRequest, response.RHash, err
 }
 
-func (lnd *LND) SubscribeInvoices(callback PublishInvoiceSettled, eventSrv *eventsource.Server) error {
+func (lnd *LND) InvoiceSettled(paymentHash []byte) (settled bool, err error) {
+	var invoice *lnrpc.Invoice
+
+	rpcPaymentHash := lnrpc.PaymentHash{
+		RHash: paymentHash,
+	}
+
+	invoice, err = lnd.client.LookupInvoice(lnd.ctx, &rpcPaymentHash)
+
+	if err != nil {
+		return false, err
+	}
+
+	return invoice.Settled, err
+}
+
+func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPendingInvoices) error {
 	stream, err := lnd.client.SubscribeInvoices(lnd.ctx, &lnrpc.InvoiceSubscription{})
 
 	if err != nil {
@@ -102,12 +117,16 @@ func (lnd *LND) SubscribeInvoices(callback PublishInvoiceSettled, eventSrv *even
 			}
 
 			if invoice.Settled {
-				callback(invoice.PaymentRequest, eventSrv)
+				publish(invoice.PaymentRequest)
 			}
 
 		}
 
 	}()
+
+	// Connected successfully to LND
+	// If there are pending invoices after reconnecting they should get rescanned now
+	rescan()
 
 	<-wait
 

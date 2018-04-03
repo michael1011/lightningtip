@@ -28,6 +28,8 @@ const (
 
 	defaultTipExpiry = 3600
 
+	defaultReconnect = false
+
 	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
 	defaultMacaroonFile = "invoice.macaroon"
@@ -48,6 +50,8 @@ type config struct {
 	AccessDomain string `long:"accessdomain" Description:"The domain you are using LightningTip from"`
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
+
+	Reconnect bool `long:"reconnect" Description:"If enabled LightningTip will try to reconnect to LND instead of exiting"`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }
@@ -72,6 +76,8 @@ func initConfig() {
 		AccessDomain: defaultAccessDomain,
 
 		TipExpiry: defaultTipExpiry,
+
+		Reconnect: defaultReconnect,
 
 		LND: &backends.LND{
 			GRPCHost:     defaultLndGRPCHost,
@@ -142,7 +148,6 @@ func initConfig() {
 
 	backends.UseLogger(*log)
 
-	// TODO: add more backend options like for example c-lighting and eclair
 	backend = cfg.LND
 }
 

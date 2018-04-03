@@ -23,9 +23,10 @@ var eventSrv *eventsource.Server
 var pendingInvoices []PendingInvoice
 
 type PendingInvoice struct {
-	Invoice string
-	Hash    string
-	Expiry  time.Time
+	Invoice     string
+	PaymentHash []byte
+	Hash        string
+	Expiry      time.Time
 }
 
 // To use the pendingInvoice type as event for the EventSource stream
@@ -107,14 +108,7 @@ func main() {
 		log.Info("Subscribing to invoices")
 
 		go func() {
-			err = backend.SubscribeInvoices(publishInvoiceSettled, eventSrv)
-
-			if err != nil {
-				log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))
-
-				os.Exit(1)
-			}
-
+			subscribeToInvoices()
 		}()
 
 		log.Info("Starting HTTP server")
@@ -143,8 +137,52 @@ func main() {
 
 }
 
-// Callback for backend
-func publishInvoiceSettled(invoice string, eventSrv *eventsource.Server) {
+func subscribeToInvoices() {
+	err := backend.SubscribeInvoices(publishInvoiceSettled, rescanPendingInvoices)
+
+	log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))
+
+	if err != nil {
+		if cfg.Reconnect {
+			time.Sleep(time.Second)
+
+			log.Info("Trying to reconnect to LND")
+
+			subscribeToInvoices()
+
+		} else {
+			os.Exit(1)
+		}
+
+	}
+
+}
+
+func rescanPendingInvoices() {
+	log.Info("Connected to LND")
+
+	if len(pendingInvoices) > 0 {
+		log.Debug("Rescanning pending invoices")
+
+		for _, invoice := range pendingInvoices {
+			settled, err := backend.InvoiceSettled(invoice.PaymentHash)
+
+			if err == nil {
+				if settled {
+					publishInvoiceSettled(invoice.Invoice)
+				}
+
+			} else {
+				log.Warning("Failed to check if invoice settled \"" + invoice.Invoice + "\": " + fmt.Sprint(err))
+			}
+
+		}
+
+	}
+
+}
+
+func publishInvoiceSettled(invoice string) {
 	for index, pending := range pendingInvoices {
 		if pending.Invoice == invoice {
 			log.Info("Invoice settled: " + invoice)
@@ -212,7 +250,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 		if err == nil {
 			if body.Amount != 0 {
-				invoice, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
+				invoice, paymentHash, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
 
 				if err == nil {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
@@ -236,9 +274,10 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 					log.Info(logMessage)
 
 					pendingInvoices = append(pendingInvoices, PendingInvoice{
-						Invoice: invoice,
-						Hash:    hash,
-						Expiry:  time.Now().Add(expiryDuration),
+						Invoice:     invoice,
+						PaymentHash: paymentHash,
+						Hash:        hash,
+						Expiry:      time.Now().Add(expiryDuration),
 					})
 
 					writer.Write(marshalJson(invoiceResponse{
@@ -251,7 +290,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 				} else {
 					errorMessage = "Failed to create invoice"
 
-					// This is way to hacky
+					// This is way too hacky
 					// Maybe a cast to the gRPC error and get its error message directly
 					if fmt.Sprint(err)[:47] == "rpc error: code = Unknown desc = memo too large" {
 						errorMessage += ": message too long"
