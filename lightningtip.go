@@ -218,7 +218,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
 
 					if body.Message != "" {
-						// Clear new lines at the end of the messages
+						// Deletes new lines at the end of the messages
 						if strings.HasSuffix(body.Message, "\n") {
 							body.Message = strings.TrimSuffix(body.Message, "\n")
 						}
@@ -271,7 +271,12 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
-	writeError(writer, "Not found")
+	if request.RequestURI == "/" {
+		writeError(writer, "This is an API to connect LND and your website. You should not open this in your browser")
+
+	} else {
+		writeError(writer, "Not found")
+	}
 }
 
 func handleHeaders(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
