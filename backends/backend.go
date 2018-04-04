@@ -15,4 +15,6 @@ type Backend interface {
 	InvoiceSettled(paymentHash []byte) (settled bool, err error)
 
 	SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPendingInvoices) error
+
+	KeepAliveRequest()
 }

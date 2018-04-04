@@ -79,13 +79,13 @@ func main() {
 		log.Debug("Starting ticker to clear expired invoices")
 
 		// A bit longer than the expiry time to make sure the invoice doesn't show as settled if it isn't (affects just invoiceSettledHandler)
-		duration := time.Duration(cfg.TipExpiry + 10)
-		ticker := time.Tick(duration * time.Second)
+		expiryInterval := time.Duration(cfg.TipExpiry + 10)
+		expiryTicker := time.Tick(expiryInterval * time.Second)
 
 		go func() {
 			for {
 				select {
-				case <-ticker:
+				case <-expiryTicker:
 					now := time.Now()
 
 					for index := len(pendingInvoices) - 1; index >= 0; index-- {
@@ -110,6 +110,23 @@ func main() {
 		go func() {
 			subscribeToInvoices()
 		}()
+
+		if cfg.KeepAliveInterval > 0 {
+			log.Debug("Starting ticker to send keepalive requests")
+
+			interval := time.Duration(cfg.KeepAliveInterval)
+			keepAliveTicker := time.Tick(interval * time.Second)
+
+			go func() {
+				for {
+					select {
+					case <-keepAliveTicker:
+						backend.KeepAliveRequest()
+					}
+				}
+			}()
+
+		}
 
 		log.Info("Starting HTTP server")
 

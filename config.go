@@ -29,6 +29,7 @@ const (
 	defaultTipExpiry = 3600
 
 	defaultReconnectInterval = 0
+	defaultKeepaliveInterval = 0
 
 	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
@@ -51,7 +52,8 @@ type config struct {
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
 
-	ReconnectInterval int64 `long:"reconnectInterval" Description:"Reconnect interval to LND in seconds"`
+	ReconnectInterval int64 `long:"reconnectinterval" Description:"Reconnect interval to LND in seconds"`
+	KeepAliveInterval int64 `long:"keepaliveinterval" Description:"Send a dummy request to LND to prevent timeouts "`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }
@@ -78,6 +80,7 @@ func initConfig() {
 		TipExpiry: defaultTipExpiry,
 
 		ReconnectInterval: defaultReconnectInterval,
+		KeepAliveInterval: defaultKeepaliveInterval,
 
 		LND: &backends.LND{
 			GRPCHost:     defaultLndGRPCHost,

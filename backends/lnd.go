@@ -133,6 +133,10 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 	return err
 }
 
+func (lnd *LND) KeepAliveRequest() {
+	lnd.client.GetInfo(lnd.ctx, &lnrpc.GetInfoRequest{})
+}
+
 func getMacaroon(macaroonFile string) (macaroon metadata.MD, err error) {
 	data, err := ioutil.ReadFile(macaroonFile)
 
