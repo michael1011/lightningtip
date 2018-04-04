@@ -143,8 +143,8 @@ func subscribeToInvoices() {
 	log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))
 
 	if err != nil {
-		if cfg.Reconnect {
-			time.Sleep(time.Second)
+		if cfg.ReconnectInterval != 0 {
+			time.Sleep(time.Duration(cfg.ReconnectInterval) * time.Second)
 
 			log.Info("Trying to reconnect to LND")
 
@@ -257,9 +257,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 					if body.Message != "" {
 						// Deletes new lines at the end of the messages
-						if strings.HasSuffix(body.Message, "\n") {
-							body.Message = strings.TrimSuffix(body.Message, "\n")
-						}
+						body.Message = strings.TrimSuffix(body.Message, "\n")
 
 						logMessage += " with message \"" + body.Message + "\""
 					}

@@ -28,7 +28,7 @@ const (
 
 	defaultTipExpiry = 3600
 
-	defaultReconnect = false
+	defaultReconnectInterval = 0
 
 	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
@@ -51,7 +51,7 @@ type config struct {
 
 	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
 
-	Reconnect bool `long:"reconnect" Description:"If enabled LightningTip will try to reconnect to LND instead of exiting"`
+	ReconnectInterval int64 `long:"reconnectInterval" Description:"Reconnect interval to LND in seconds"`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 }
@@ -77,7 +77,7 @@ func initConfig() {
 
 		TipExpiry: defaultTipExpiry,
 
-		Reconnect: defaultReconnect,
+		ReconnectInterval: defaultReconnectInterval,
 
 		LND: &backends.LND{
 			GRPCHost:     defaultLndGRPCHost,
