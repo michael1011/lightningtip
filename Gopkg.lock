@@ -36,8 +36,8 @@
 [[projects]]
   name = "github.com/lightningnetwork/lnd"
   packages = ["lnrpc"]
-  revision = "b866806d67d80e5963ed398f55ab800031df1bf1"
-  version = "0.4-beta"
+  revision = "6fa93a78c18180a3bc77116b749b3c5e279d5a33"
+  version = "v0.4.1-beta"
 
 [[projects]]
   name = "github.com/op/go-logging"
@@ -111,6 +111,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "893dbfd280cd502dd2f2e998c612c04aeb6b6e754c0c2692b320d6545314b4b8"
+  inputs-digest = "52a7642d00cb9b0bd9f89ce67bcf84311eecb8709bc6639bf02a729c07f38481"
   solver-name = "gps-cdcl"
   solver-version = 1
