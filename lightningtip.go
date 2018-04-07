@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/donovanhide/eventsource"
+	"github.com/michael1011/lightningtip/database"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -24,6 +25,8 @@ var pendingInvoices []PendingInvoice
 
 type PendingInvoice struct {
 	Invoice     string
+	Amount      int64
+	Message     string
 	PaymentHash []byte
 	Hash        string
 	Expiry      time.Time
@@ -61,6 +64,17 @@ func main() {
 	initLog()
 
 	initConfig()
+
+	dbErr := database.InitDatabase(cfg.DatabaseFile)
+
+	if dbErr != nil {
+		log.Error("Failed to initialize database: " + fmt.Sprint(dbErr))
+
+		os.Exit(1)
+
+	} else {
+		log.Debug("Opened SQLite database: " + cfg.DatabaseFile)
+	}
 
 	err := backend.Connect()
 
@@ -206,6 +220,8 @@ func publishInvoiceSettled(invoice string) {
 
 			eventSrv.Publish([]string{eventChannel}, pending)
 
+			database.AddSettledInvoice(pending.Amount, pending.Message)
+
 			pendingInvoices = append(pendingInvoices[:index], pendingInvoices[index+1:]...)
 
 			break
@@ -290,6 +306,8 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 					pendingInvoices = append(pendingInvoices, PendingInvoice{
 						Invoice:     invoice,
+						Amount:      body.Amount,
+						Message:     body.Message,
 						PaymentHash: paymentHash,
 						Hash:        hash,
 						Expiry:      time.Now().Add(expiryDuration),

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jessevdk/go-flags"
 	"github.com/michael1011/lightningtip/backends"
+	"github.com/michael1011/lightningtip/database"
 	"github.com/op/go-logging"
 	"os"
 	"os/user"
@@ -19,6 +20,8 @@ const (
 
 	defaultLogFile  = "lightningTip.log"
 	defaultLogLevel = "info"
+
+	defaultDatabaseFile = "tips.db"
 
 	defaultRESTHost    = "0.0.0.0:8081"
 	defaultTLSCertFile = ""
@@ -43,6 +46,8 @@ type config struct {
 
 	LogFile  string `long:"logfile" Description:"Location of the log file"`
 	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
+
+	DatabaseFile string `long:"databasefile" Description:"Location of the database file to store settled invoices"`
 
 	RESTHost    string `long:"resthost" Description:"Host for the REST interface of LightningTip"`
 	TLSCertFile string `long:"tlscertfile" Description:"Certificate for using LightningTip via HTTPS"`
@@ -70,6 +75,8 @@ func initConfig() {
 
 		LogFile:  path.Join(getDefaultDataDir(), defaultLogFile),
 		LogLevel: defaultLogLevel,
+
+		DatabaseFile: path.Join(getDefaultDataDir(), defaultDatabaseFile),
 
 		RESTHost:    defaultRESTHost,
 		TLSCertFile: defaultTLSCertFile,
@@ -149,6 +156,7 @@ func initConfig() {
 		log.Debug("Initialized log file: " + cfg.LogFile)
 	}
 
+	database.UseLogger(*log)
 	backends.UseLogger(*log)
 
 	backend = cfg.LND
