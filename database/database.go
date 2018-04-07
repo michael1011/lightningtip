@@ -2,10 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"time"
-
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"time"
 )
 
 var db *sql.DB

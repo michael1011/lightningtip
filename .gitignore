@@ -3,7 +3,8 @@
 *.dll
 *.so
 *.dylib
-lightningTip
+/lightningTip
+/tipreport
 
 # Test binary, build with `go test -c`
 *.test

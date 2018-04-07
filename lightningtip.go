@@ -59,6 +59,7 @@ type errorResponse struct {
 	Error string
 }
 
+// TODO: add version flag
 // TODO: add option to show URI of Lightning node
 func main() {
 	initLog()
@@ -82,6 +83,8 @@ func main() {
 		log.Info("Starting EventSource stream")
 
 		eventSrv = eventsource.NewServer()
+
+		defer eventSrv.Close()
 
 		http.Handle("/", handleHeaders(notFoundHandler))
 		http.Handle("/getinvoice", handleHeaders(getInvoiceHandler))

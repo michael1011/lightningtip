@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -176,7 +177,7 @@ func getDefaultDataDir() (dir string) {
 		dir = path.Join(homeDir, "."+strings.ToLower(defaultDataDir))
 	}
 
-	return dir
+	return cleanPath(dir)
 }
 
 func getDefaultLndDir() (dir string) {
@@ -193,7 +194,7 @@ func getDefaultLndDir() (dir string) {
 		dir = path.Join(homeDir, ".lnd")
 	}
 
-	return dir
+	return cleanPath(dir)
 }
 
 func getHomeDir() (dir string) {
@@ -213,5 +214,11 @@ func getHomeDir() (dir string) {
 
 	}
 
-	return dir
+	return cleanPath(dir)
+}
+
+func cleanPath(path string) string {
+	path = filepath.Clean(os.ExpandEnv(path))
+
+	return strings.Replace(path, "\\", "/", -1)
 }
