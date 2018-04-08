@@ -38,6 +38,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		summaryCommand,
+		listCommand,
 	}
 
 	err := app.Run(os.Args)
