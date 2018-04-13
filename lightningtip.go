@@ -122,8 +122,6 @@ func main() {
 
 		}()
 
-		log.Info("Subscribing to invoices")
-
 		go func() {
 			subscribeToInvoices()
 		}()
@@ -172,17 +170,15 @@ func main() {
 }
 
 func subscribeToInvoices() {
+	log.Info("Subscribing to invoices")
+
 	err := backend.SubscribeInvoices(publishInvoiceSettled, rescanPendingInvoices)
 
 	log.Error("Failed to subscribe to invoices: " + fmt.Sprint(err))
 
 	if err != nil {
 		if cfg.ReconnectInterval != 0 {
-			time.Sleep(time.Duration(cfg.ReconnectInterval) * time.Second)
-
-			log.Info("Trying to reconnect to LND")
-
-			subscribeToInvoices()
+			reconnectToBackend()
 
 		} else {
 			os.Exit(1)
@@ -192,9 +188,36 @@ func subscribeToInvoices() {
 
 }
 
-func rescanPendingInvoices() {
-	log.Info("Connected to LND")
+func reconnectToBackend() {
+	time.Sleep(time.Duration(cfg.ReconnectInterval) * time.Second)
 
+	log.Info("Trying to reconnect to LND")
+
+	backend = cfg.LND
+
+	err := backend.Connect()
+
+	if err == nil {
+		err = backend.KeepAliveRequest()
+
+		// The default macaroon file used by LightningTip "invoice.macaroon" allows only creating and checking status of invoices
+		// The keep alive request doesn't have to be successful as long as it can establish a connection to LND
+		if err == nil || fmt.Sprint(err) == "rpc error: code = Unknown desc = permission denied" {
+			log.Info("Reconnected to LND")
+
+			subscribeToInvoices()
+		}
+
+	}
+
+	log.Info("Connection failed")
+
+	log.Debug(fmt.Sprint(err))
+
+	reconnectToBackend()
+}
+
+func rescanPendingInvoices() {
 	if len(pendingInvoices) > 0 {
 		log.Debug("Rescanning pending invoices")
 
@@ -207,7 +230,7 @@ func rescanPendingInvoices() {
 				}
 
 			} else {
-				log.Warning("Failed to check if invoice settled \"" + invoice.Invoice + "\": " + fmt.Sprint(err))
+				log.Warning("Failed to check if invoice settled: " + fmt.Sprint(err))
 			}
 
 		}

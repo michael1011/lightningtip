@@ -15,10 +15,10 @@ import (
 type LND struct {
 	GRPCHost     string `long:"grpchost" Description:"Host of the gRPC interface of LND"`
 	CertFile     string `long:"certfile" Description:"TLS certificate for the LND gRPC and REST services"`
-	MacaroonFile string `long:"macaroonfile" Description:"Admin macaroon file for authentication. Set to an empty string for no macaroon"`
+	MacaroonFile string `long:"macaroonfile" Description:"Macaroon file for authentication. Set to an empty string for no macaroon"`
 
-	client lnrpc.LightningClient
 	ctx    context.Context
+	client lnrpc.LightningClient
 }
 
 func (lnd *LND) Connect() error {
@@ -38,16 +38,21 @@ func (lnd *LND) Connect() error {
 		return err
 	}
 
-	lnd.ctx = context.Background()
+	if lnd.ctx == nil {
+		lnd.ctx = context.Background()
 
-	if lnd.MacaroonFile != "" {
-		macaroon, err := getMacaroon(lnd.MacaroonFile)
+		if lnd.MacaroonFile != "" {
+			macaroon, err := getMacaroon(lnd.MacaroonFile)
 
-		if macaroon == nil && err != nil {
-			log.Error("Failed to read admin macaroon file of LND")
+			if macaroon == nil && err != nil {
+				log.Error("Failed to read macaroon file of LND")
+
+			} else {
+				lnd.ctx = metadata.NewOutgoingContext(lnd.ctx, macaroon)
+			}
+
 		}
 
-		lnd.ctx = metadata.NewOutgoingContext(lnd.ctx, macaroon)
 	}
 
 	lnd.client = lnrpc.NewLightningClient(con)
@@ -133,8 +138,10 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 	return err
 }
 
-func (lnd *LND) KeepAliveRequest() {
-	lnd.client.GetInfo(lnd.ctx, &lnrpc.GetInfoRequest{})
+func (lnd *LND) KeepAliveRequest() error {
+	_, err := lnd.client.GetInfo(lnd.ctx, &lnrpc.GetInfoRequest{})
+
+	return err
 }
 
 func getMacaroon(macaroonFile string) (macaroon metadata.MD, err error) {

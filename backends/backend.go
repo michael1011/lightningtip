@@ -16,5 +16,5 @@ type Backend interface {
 
 	SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPendingInvoices) error
 
-	KeepAliveRequest()
+	KeepAliveRequest() error
 }
