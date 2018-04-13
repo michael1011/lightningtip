@@ -66,7 +66,7 @@ func getDefaultDatabaseFile() (dir string) {
 		dir = path.Join(usr.HomeDir, "AppData/Local", defaultDataDir, defaultDatabaseFile)
 
 	default:
-		dir = path.Join(usr.HomeDir, "."+strings.ToLower(defaultDataDir), defaultDataDir)
+		dir = path.Join(usr.HomeDir, "."+strings.ToLower(defaultDataDir), defaultDatabaseFile)
 	}
 
 	return cleanPath(dir)
