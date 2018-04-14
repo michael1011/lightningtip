@@ -1,13 +1,18 @@
+a {
+    font-weight: 600;
+}
+
 #lightningTip {
     width: 12em;
 
     padding: 1em;
 
-    background-color: #212121;
+    background-color: #FFFFFF;
 
+    border: 2px #BDBDBD solid;
     border-radius: 4px;
 
-    color: #F5F5F5;
+    color: #FFB300;
 
     font-size: 20px;
     font-family: Arial, Helvetica, sans-serif;
@@ -22,14 +27,14 @@
 
     padding: 6px 10px;
 
-    border: none;
+    border: 1px #BDBDBD solid;
     border-radius: 4px;
 
     font-size: 15px;
 
     color: #212121;
 
-    background-color: #F5F5F5;
+    background-color: #FFFFFF;
 
     outline: none;
     resize: none;
@@ -42,9 +47,9 @@
 
     font-size: 17px;
 
-    color: #212121;
+    color: #FFFFFF;
 
-    background-color: #FFC83D;
+    background-color: #FFB300;
 
     border: none;
     border-radius: 4px;
@@ -101,7 +106,7 @@
 #lightningTipError {
     font-size: 17px;
 
-    color: #F44336;
+    color: #D50000;
 }
 
 #lightningTipInvoice {
@@ -118,7 +123,7 @@
 }
 
 #lightningTipCopy {
-    border-right: 1px solid #F5F5F5;
+    border-right: 1px solid #FFFFFF;
 
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
