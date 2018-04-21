@@ -1,173 +1,38 @@
-a {
-    font-weight: 600;
+#lightningTip > a {
+    font-weight: 600 !important;
 }
 
 #lightningTip {
-    width: 12em;
+    background-color: #FFFFFF !important;
 
-    padding: 1em;
+    border: 2px #BDBDBD solid !important;
 
-    background-color: #FFFFFF;
+    color: #FFB300 !important;
 
-    border: 2px #BDBDBD solid;
-    border-radius: 4px;
-
-    color: #FFB300;
-
-    font-size: 20px;
-    font-family: Arial, Helvetica, sans-serif;
-
-    text-align: center;
 }
 
 .lightningTipInput {
-    width: 100%;
+    border: 1px #BDBDBD solid !important;
 
-    display: inline-block;
-
-    padding: 6px 10px;
-
-    border: 1px #BDBDBD solid;
-    border-radius: 4px;
-
-    font-size: 15px;
-
-    color: #212121;
-
-    background-color: #FFFFFF;
-
-    outline: none;
-    resize: none;
-
-    overflow-y: hidden;
+    background-color: #FFFFFF !important;
 }
 
 .lightningTipButton {
-    padding: 0.4em 1em;
+    color: #FFFFFF !important;
 
-    font-size: 17px;
-
-    color: #FFFFFF;
-
-    background-color: #FFB300;
-
-    border: none;
-    border-radius: 4px;
-
-    outline: none;
-    cursor: pointer;
-}
-
-.lightningTipButton:focus {
-    outline: none;
-}
-
-.lightningTipButton::-moz-focus-inner {
-    outline: none;
-
-    border: 0;
-}
-
-#lightningTipLogo {
-    margin-top: 0;
-    margin-bottom: 0.6em;
-
-    font-size: 25px;
-}
-
-#lightningTipInputs {
-    margin-top: 0.8em;
-}
-
-#lightningTipMessage {
-    min-height: 55px;
-
-    margin-top: 0.5em;
-    padding: 8px 10px;
-
-    display: inline-block;
-    box-sizing: border-box;
-
-    text-align: left;
-
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Hack for using placeholders on divs */
-#lightningTipMessage:empty:before {
-    content: attr(placeholder);
-    color: gray;
-}
-
-#lightningTipGetInvoice {
-    margin-top: 1em;
+    background-color: #FFB300 !important;
 }
 
 #lightningTipError {
-    font-size: 17px;
+    color: #D50000 !important;
 
-    color: #D50000;
-}
-
-#lightningTipInvoice {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-}
-
-#lightningTipQR {
-    margin-bottom: 0.8em;
-}
-
-#lightningTipTools {
-    height: 100px;
+    font-weight: 600 !important;
 }
 
 #lightningTipCopy {
-    border-right: 1px solid #FFFFFF;
-
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-
-    float: left;
-}
-
-#lightningTipOpen {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-
-    float: left;
+    border-right: 1px solid #FFFFFF !important;
 }
 
 #lightningTipExpiry {
-    padding: 0.3em 0;
-
-    float: right;
-}
-
-#lightningTipFinished {
-    margin-bottom: 0.2em;
-
-    display: block;
-}
-
-.spinner {
-    width: 12px;
-    height: 12px;
-
-    display: inline-block;
-
-    border: 3px solid #F5F5F5;
-    border-top: 3px solid #212121;
-    border-radius: 50%;
-
-    animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    font-weight: 600 !important;
 }

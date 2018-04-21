@@ -12,6 +12,14 @@ The default config file location is `$HOME/.lightningtip/lightningTip.conf`. The
 
 The next step is embedding LightningTip on your website. Upload all files excluding `lightningTip.html` to your webserver. Copy the contents of the head tag from `lightningTip.html` into the head section of the HTML file you want to show LightningTip in. The div below the head tag is LightningTip itself. Paste it into any place in the already edited HTML file on your server.
 
+There is a light theme available for LightningTip. If you want to use it **add** this to the head tag of your HTML file:
+
+```
+<link rel="stylesheet" href="lightningTip_light.css">
+```
+
+**Do not use LightningTip on XHTML** sites. That causes some weird scaling issues.
+
 Make sure that the executable of **LightningTip is always running** in the background. It is an [API](https://github.com/michael1011/lightningtip/wiki/API-documentation) to connect LND and the widget on your website. **Do not open the URL you are running LightingTip on in your browser.** All this will do is show an error.
 
 If you are not running LightningTip on the same domain or IP address as your webserver, or not on port 8081, change the variable `requestUrl` (which is in the first line) in the file `lightningTip.js` accordingly.
