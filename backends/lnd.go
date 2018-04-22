@@ -122,7 +122,7 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 			}
 
 			if invoice.Settled {
-				publish(invoice.PaymentRequest)
+				go publish(invoice.PaymentRequest)
 			}
 
 		}

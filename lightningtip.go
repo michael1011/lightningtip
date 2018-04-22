@@ -240,13 +240,17 @@ func rescanPendingInvoices() {
 }
 
 func publishInvoiceSettled(invoice string) {
-	for index, pending := range pendingInvoices {
-		if pending.Invoice == invoice {
+	for index, settled := range pendingInvoices {
+		if settled.Invoice == invoice {
 			log.Info("Invoice settled: " + invoice)
 
-			eventSrv.Publish([]string{eventChannel}, pending)
+			eventSrv.Publish([]string{eventChannel}, settled)
 
-			database.AddSettledInvoice(pending.Amount, pending.Message)
+			database.AddSettledInvoice(settled.Amount, settled.Message)
+
+			if cfg.Mail.Email != "" {
+				cfg.Mail.SendMail(settled.Amount, settled.Message)
+			}
 
 			pendingInvoices = append(pendingInvoices[:index], pendingInvoices[index+1:]...)
 

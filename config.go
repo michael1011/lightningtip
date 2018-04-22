@@ -5,6 +5,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/michael1011/lightningtip/backends"
 	"github.com/michael1011/lightningtip/database"
+	"github.com/michael1011/lightningtip/notifications"
 	"github.com/op/go-logging"
 	"os"
 	"os/user"
@@ -38,6 +39,15 @@ const (
 	defaultLndGRPCHost  = "localhost:10009"
 	defaultLndCertFile  = "tls.cert"
 	defaultMacaroonFile = "invoice.macaroon"
+
+	defaultEmail = ""
+
+	defaultSmtpServer = ""
+	defaultSmtpSender = ""
+
+	defaultSmtpSSL      = false
+	defaultSmtpUser     = ""
+	defaultSmtpPassword = ""
 )
 
 type config struct {
@@ -62,6 +72,8 @@ type config struct {
 	KeepAliveInterval int64 `long:"keepaliveinterval" Description:"Send a dummy request to LND to prevent timeouts "`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
+
+	Mail *notifications.Mail `group:"Mail" namespace:"mail"`
 }
 
 var cfg config
@@ -94,6 +106,17 @@ func initConfig() {
 			GRPCHost:     defaultLndGRPCHost,
 			CertFile:     path.Join(getDefaultLndDir(), defaultLndCertFile),
 			MacaroonFile: path.Join(getDefaultLndDir(), defaultMacaroonFile),
+		},
+
+		Mail: &notifications.Mail{
+			Email: defaultEmail,
+
+			SmtpServer: defaultSmtpServer,
+			SmtpSender: defaultSmtpSender,
+
+			SmtpSSL:      defaultSmtpSSL,
+			SmtpUser:     defaultSmtpUser,
+			SmtpPassword: defaultSmtpPassword,
 		},
 	}
 
@@ -159,6 +182,7 @@ func initConfig() {
 
 	database.UseLogger(*log)
 	backends.UseLogger(*log)
+	notifications.UseLogger(*log)
 
 	backend = cfg.LND
 }
