@@ -9,12 +9,11 @@ import (
 	"strconv"
 )
 
-// TODO: make subject and body of mail configurable
 type Mail struct {
-	Email string `long:"email" Description:"Email address to which notifications get sent"`
+	Recipient string `long:"recipient" Description:"Email address to which notifications get sent"`
+	Sender    string `long:"sender" Description:"Email address from which notifications get sent"`
 
 	SmtpServer string `long:"server" Description:"SMTP server with port for sending mails"`
-	SmtpSender string `long:"sender" Description:"Email address from which notifications get sent"`
 
 	SmtpSSL      bool   `long:"ssl" Description:"Whether SSL should be used or not"`
 	SmtpUser     string `long:"user" Description:"User for authenticating the SMTP connection"`
@@ -36,7 +35,15 @@ func (mail *Mail) SendMail(amount int64, message string) {
 
 	if mail.SmtpServer == "" {
 		// "mail" command will be used for sending
-		cmd := exec.Command(sendmail, "-s", subject, mail.Email)
+		var cmd *exec.Cmd
+
+		if mail.Sender == "" {
+			cmd = exec.Command(sendmail, "-s", subject, mail.Recipient)
+
+		} else {
+			// Append "From" header
+			cmd = exec.Command(sendmail, "-s", subject, "-a", "From: "+mail.Sender, mail.Recipient)
+		}
 
 		writer, err := cmd.StdinPipe()
 
@@ -102,7 +109,7 @@ func (mail *Mail) sendMailSmtp(body string) {
 	}
 
 	if mail.SmtpSSL {
-		body = "From: " + mail.SmtpSender + newLine + "To: " + mail.Email + newLine + body
+		body = "From: " + mail.Sender + newLine + "To: " + mail.Recipient + newLine + body
 
 		tlsConfig := &tls.Config{
 			ServerName:         host,
@@ -137,8 +144,8 @@ func (mail *Mail) sendMailSmtp(body string) {
 			return
 		}
 
-		err = client.Mail(mail.SmtpSender)
-		err = client.Rcpt(mail.Email)
+		err = client.Mail(mail.Sender)
+		err = client.Rcpt(mail.Recipient)
 
 		writer, err := client.Data()
 
@@ -159,8 +166,8 @@ func (mail *Mail) sendMailSmtp(body string) {
 		err := smtp.SendMail(
 			mail.SmtpServer,
 			auth,
-			mail.SmtpSender,
-			[]string{mail.Email},
+			mail.Sender,
+			[]string{mail.Recipient},
 			[]byte(body),
 		)
 

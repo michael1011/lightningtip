@@ -40,10 +40,10 @@ const (
 	defaultLndCertFile  = "tls.cert"
 	defaultMacaroonFile = "invoice.macaroon"
 
-	defaultEmail = ""
+	defaultRecipient = ""
+	defaultSender    = ""
 
 	defaultSmtpServer = ""
-	defaultSmtpSender = ""
 
 	defaultSmtpSSL      = false
 	defaultSmtpUser     = ""
@@ -109,10 +109,10 @@ func initConfig() {
 		},
 
 		Mail: &notifications.Mail{
-			Email: defaultEmail,
+			Recipient: defaultRecipient,
+			Sender:    defaultSender,
 
 			SmtpServer: defaultSmtpServer,
-			SmtpSender: defaultSmtpSender,
 
 			SmtpSSL:      defaultSmtpSSL,
 			SmtpUser:     defaultSmtpUser,

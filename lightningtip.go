@@ -248,7 +248,7 @@ func publishInvoiceSettled(invoice string) {
 
 			database.AddSettledInvoice(settled.Amount, settled.Message)
 
-			if cfg.Mail.Email != "" {
+			if cfg.Mail.Recipient != "" {
 				cfg.Mail.SendMail(settled.Amount, settled.Message)
 			}
 
