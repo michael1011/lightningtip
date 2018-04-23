@@ -1,5 +1,5 @@
 # LightningTip
-A simple way to accept tips via the Lightning Network on your website.
+A simple way to accept tips via the Lightning Network on your website. If want to tip me you can find my instance of LightningTip [here](https://michael1011.at/lightning.html).
 
 <img src="https://i.imgur.com/0mOEgTf.gif" width="240">
 
