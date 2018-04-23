@@ -34,10 +34,8 @@ First of all make sure [Golang](https://golang.org/) and [Dep](https://github.co
 ```
 go get -d github.com/michael1011/lightningtip
 cd $GOPATH/src/github.com/michael1011/lightningtip
-dep ensure
-go install
-cd cmd/tipreport
-go install
+
+make && make install
 ```
 
 To start run `$GOPATH/bin/lightningtip` or follow the instructions below to setup a service to run LightningTip automatically.
@@ -48,10 +46,8 @@ Make sure you stop any running LightningTip process before upgrading, then pull 
 ```
 cd $GOPATH/src/github.com/michael1011/lightningtip
 git pull
-dep ensure
-go install
-cd cmd/tipreport
-go install
+
+make && make install
 ```
 
 ## Starting LightningTip Automatically

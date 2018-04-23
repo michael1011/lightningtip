@@ -4,7 +4,9 @@
 *.so
 *.dylib
 /lightningTip
+/lightningtip
 /tipreport
+lightningTip*/
 
 # Test binary, build with `go test -c`
 *.test
