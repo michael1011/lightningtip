@@ -6,6 +6,8 @@ GOINSTALL := go install -v
 GO_BIN := ${GOPATH}/bin
 DEP_BIN := $(GO_BIN)/dep
 
+HAVE_DEP := $(shell command -v $(DEP_BIN) 2> /dev/null)
+
 GREEN := "\\033[0;32m"
 NC := "\\033[0m"
 
@@ -16,6 +18,10 @@ endef
 default: scratch
 
 # Dependencies
+
+$(DEP_BIN):
+	@$(call print, "Fetching dep")
+	go get -u github.com/golang/dep/cmd/dep
 
 dep: $(DEP_BIN)
 	@$(call print, "Compiling dependencies")
