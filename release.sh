@@ -31,6 +31,8 @@ GCC=( "i686-w64-mingw32-gcc" "x86_64-w64-mingw32-gcc" "gcc" "gcc" "arm-linux-gnu
 # Additional flag to allow cross compiling from 64 to 32 bit on Linux
 GCC_LINUX_32BIT="-m32"
 
+cp -r ../frontend/ .
+
 # Use the first element of $GOPATH in the case where GOPATH is a list
 # (something that is totally allowed).
 GPATH=$(echo $GOPATH | cut -f1 -d:)
@@ -60,11 +62,13 @@ for index in ${!SYS[@]}; do
     cd ..
 
     if [[ $OS = "windows" ]]; then
-	zip -r $PACKAGE-${SYS[index]}-$TAG.zip $PACKAGE-${SYS[index]}-$TAG
+	zip -r $PACKAGE-${SYS[index]}-$TAG.zip $PACKAGE-${SYS[index]}-$TAG frontend/
     else
-	tar -cvzf $PACKAGE-${SYS[index]}-$TAG.tar.gz $PACKAGE-${SYS[index]}-$TAG
+	tar -cvzf $PACKAGE-${SYS[index]}-$TAG.tar.gz $PACKAGE-${SYS[index]}-$TAG frontend/
     fi
 
     rm -r $PACKAGE-${SYS[index]}-$TAG
 
 done
+
+rm -rf frontend
