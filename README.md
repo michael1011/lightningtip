@@ -1,7 +1,7 @@
 # LightningTip
 A simple way to accept tips via the Lightning Network on your website.
 
-<img src="https://i.imgur.com/tTQnnoJ.gif" width="240">
+<img src="https://i.imgur.com/0mOEgTf.gif" width="240">
 
 ## How to install
 To get all necessary files for setting up LightningTip you can either [download a prebuilt version](https://github.com/michael1011/lightningtip/releases) or [compile from source](#how-to-install).
