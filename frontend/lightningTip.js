@@ -3,7 +3,7 @@
 var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
 
 // To prohibit multiple requests at the same time
-var running = false;
+var requestPending = false;
 
 var invoice;
 var qrCode;
@@ -46,8 +46,8 @@ window.onload = function () {
 // TODO: fix scaling on phones
 // TODO: show price in dollar?
 function getInvoice() {
-    if (running === false) {
-        running = true;
+    if (!requestPending) {
+        requestPending = true;
 
         var tipValue = document.getElementById("lightningTipAmount");
 
@@ -100,8 +100,6 @@ function getInvoice() {
 
                                 showQRCode();
 
-                                running = false;
-
                             } else {
                                 showErrorMessage(json.Error);
                             }
@@ -112,6 +110,7 @@ function getInvoice() {
                             showErrorMessage("Failed to reach backend");
                         }
 
+                        requestPending = false;
                     }
 
                 };
@@ -159,26 +158,31 @@ function listenInvoiceSettled(hash) {
         console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice is settled");
 
         var interval = setInterval(function () {
-            var request = new XMLHttpRequest();
+            if (!requestPending) {
+                requestPending = true;
 
-            request.onreadystatechange = function () {
-                if (request.readyState === 4 && request.status === 200) {
-                    var json = JSON.parse(request.responseText);
+                var request = new XMLHttpRequest();
 
-                    if (json.Settled) {
-                        console.log("Invoice settled");
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var json = JSON.parse(request.responseText);
 
-                        clearInterval(interval);
+                        if (json.Settled) {
+                            console.log("Invoice settled");
 
-                        showThankYouScreen();
+                            clearInterval(interval);
+
+                            showThankYouScreen();
+                        }
+
                     }
 
-                }
+                    requestPending = false;
+                };
 
-            };
-
-            request.open("POST", requestUrl + "invoicesettled", true);
-            request.send(JSON.stringify({"InvoiceHash": hash}))
+                request.open("POST", requestUrl + "invoicesettled", true);
+                request.send(JSON.stringify({"InvoiceHash": hash}));
+            }
 
         }, 2000);
 
@@ -293,8 +297,6 @@ function copyInvoiceToClipboard() {
 }
 
 function showErrorMessage(message) {
-    running = false;
-
     console.error(message);
 
     var error = document.getElementById("lightningTipError");
