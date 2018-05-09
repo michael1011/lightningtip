@@ -1,6 +1,8 @@
 # LightningTip
 A simple way to accept tips via the Lightning Network on your website. If want to tip me you can find my instance of LightningTip [here](https://michael1011.at/lightning.html).
 
+[robclark56](https://github.com/robclark56) forked LightningTip and rewrote the backend in **PHP**. His fork is called [LightningTip-PHP](https://github.com/robclark56/lightningtip) and is a great alternative if you are not able to run the executable.
+
 <img src="https://i.imgur.com/0mOEgTf.gif" width="240">
 
 ## How to install
