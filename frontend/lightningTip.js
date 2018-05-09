@@ -65,14 +65,11 @@ function getInvoice() {
                             if (request.status === 200) {
                                 console.log("Got invoice: " + json.Invoice);
                                 console.log("Invoice expires in: " + json.Expiry);
-
-                                var hash = sha256(json.Invoice);
-
-                                console.log("Got hash of invoice: " + hash);
+                                console.log("Got rHash of invoice: " + json.RHash);
 
                                 console.log("Starting listening for invoice to get settled");
 
-                                listenInvoiceSettled(hash);
+                                listenInvoiceSettled(json.RHash);
 
                                 invoice = json.Invoice;
 
@@ -138,12 +135,12 @@ function getInvoice() {
 
 }
 
-function listenInvoiceSettled(hash) {
+function listenInvoiceSettled(rHash) {
     try {
         var eventSrc = new EventSource(requestUrl + "eventsource");
 
         eventSrc.onmessage = function (event) {
-            if (event.data === hash) {
+            if (event.data === rHash) {
                 console.log("Invoice settled");
 
                 eventSrc.close();
@@ -155,7 +152,7 @@ function listenInvoiceSettled(hash) {
 
     } catch (e) {
         console.error(e);
-        console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice is settled");
+        console.warn("Your browser does not support EventSource. Sending a request to the server every two second to check if the invoice settled");
 
         var interval = setInterval(function () {
             if (!requestPending) {
@@ -164,24 +161,27 @@ function listenInvoiceSettled(hash) {
                 var request = new XMLHttpRequest();
 
                 request.onreadystatechange = function () {
-                    if (request.readyState === 4 && request.status === 200) {
-                        var json = JSON.parse(request.responseText);
+                    if (request.readyState === 4) {
+                        if (request.status === 200) {
+                            var json = JSON.parse(request.responseText);
 
-                        if (json.Settled) {
-                            console.log("Invoice settled");
+                            if (json.Settled) {
+                                console.log("Invoice settled");
 
-                            clearInterval(interval);
+                                clearInterval(interval);
 
-                            showThankYouScreen();
+                                showThankYouScreen();
+                            }
+
                         }
 
+                        requestPending = false;
                     }
 
-                    requestPending = false;
                 };
 
                 request.open("POST", requestUrl + "invoicesettled", true);
-                request.send(JSON.stringify({"InvoiceHash": hash}));
+                request.send(JSON.stringify({"RHash": rHash}));
             }
 
         }, 2000);
@@ -297,6 +297,8 @@ function copyInvoiceToClipboard() {
 }
 
 function showErrorMessage(message) {
+    requestPending = false;
+
     console.error(message);
 
     var error = document.getElementById("lightningTipError");

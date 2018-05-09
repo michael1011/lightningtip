@@ -60,7 +60,7 @@ func (lnd *LND) Connect() error {
 	return err
 }
 
-func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, paymentHash []byte, err error) {
+func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, rHash string, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
 	response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
@@ -70,17 +70,17 @@ func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice 
 	})
 
 	if err != nil {
-		return "", nil, err
+		return "", "", err
 	}
 
-	return response.PaymentRequest, response.RHash, err
+	return response.PaymentRequest, hex.EncodeToString(response.RHash), err
 }
 
-func (lnd *LND) InvoiceSettled(paymentHash []byte) (settled bool, err error) {
+func (lnd *LND) InvoiceSettled(rHash string) (settled bool, err error) {
 	var invoice *lnrpc.Invoice
 
 	rpcPaymentHash := lnrpc.PaymentHash{
-		RHash: paymentHash,
+		RHash: []byte(rHash),
 	}
 
 	invoice, err = lnd.client.LookupInvoice(lnd.ctx, &rpcPaymentHash)

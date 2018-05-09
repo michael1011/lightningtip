@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/donovanhide/eventsource"
@@ -24,18 +22,17 @@ var eventSrv *eventsource.Server
 var pendingInvoices []PendingInvoice
 
 type PendingInvoice struct {
-	Invoice     string
-	Amount      int64
-	Message     string
-	PaymentHash []byte
-	Hash        string
-	Expiry      time.Time
+	Invoice string
+	Amount  int64
+	Message string
+	RHash   string
+	Expiry  time.Time
 }
 
 // To use the pendingInvoice type as event for the EventSource stream
 func (pending PendingInvoice) Id() string    { return "" }
 func (pending PendingInvoice) Event() string { return "" }
-func (pending PendingInvoice) Data() string  { return pending.Hash }
+func (pending PendingInvoice) Data() string  { return pending.RHash }
 
 type invoiceRequest struct {
 	Amount  int64
@@ -44,11 +41,12 @@ type invoiceRequest struct {
 
 type invoiceResponse struct {
 	Invoice string
+	RHash string
 	Expiry  int64
 }
 
 type invoiceSettledRequest struct {
-	InvoiceHash string
+	RHash string
 }
 
 type invoiceSettledResponse struct {
@@ -222,7 +220,7 @@ func rescanPendingInvoices() {
 		log.Debug("Rescanning pending invoices")
 
 		for _, invoice := range pendingInvoices {
-			settled, err := backend.InvoiceSettled(invoice.PaymentHash)
+			settled, err := backend.InvoiceSettled(invoice.RHash)
 
 			if err == nil {
 				if settled {
@@ -272,11 +270,11 @@ func invoiceSettledHandler(writer http.ResponseWriter, request *http.Request) {
 		err := json.Unmarshal(data, &body)
 
 		if err == nil {
-			if body.InvoiceHash != "" {
+			if body.RHash != "" {
 				settled := true
 
 				for _, pending := range pendingInvoices {
-					if pending.Hash == body.InvoiceHash {
+					if pending.RHash == body.RHash {
 						settled = false
 
 						break
@@ -325,26 +323,21 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 						logMessage += " with message \"" + body.Message + "\""
 					}
 
-					sha := sha256.New()
-					sha.Write([]byte(invoice))
-
-					hash := hex.EncodeToString(sha.Sum(nil))
-
 					expiryDuration := time.Duration(cfg.TipExpiry) * time.Second
 
 					log.Info(logMessage)
 
 					pendingInvoices = append(pendingInvoices, PendingInvoice{
-						Invoice:     invoice,
-						Amount:      body.Amount,
-						Message:     body.Message,
-						PaymentHash: paymentHash,
-						Hash:        hash,
-						Expiry:      time.Now().Add(expiryDuration),
+						Invoice: invoice,
+						Amount:  body.Amount,
+						Message: body.Message,
+						RHash:   string(paymentHash),
+						Expiry:  time.Now().Add(expiryDuration),
 					})
 
 					writer.Write(marshalJson(invoiceResponse{
 						Invoice: invoice,
+						RHash: paymentHash,
 						Expiry:  cfg.TipExpiry,
 					}))
 
