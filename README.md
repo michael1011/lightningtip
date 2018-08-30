@@ -6,7 +6,8 @@ A simple way to accept tips via the Lightning Network on your website. If want t
 <img src="https://i.imgur.com/0mOEgTf.gif" width="240">
 
 ## How to install
-To get all necessary files for setting up LightningTip you can either [download a prebuilt version](https://github.com/michael1011/lightningtip/releases) or [compile from source](#how-to-install).
+
+To get all necessary files for setting up LightningTip you can either [download a prebuilt version](https://github.com/michael1011/lightningtip/releases) or [compile from source](#how-to-build).
 
 LightningTip is using [LND](https://github.com/lightningnetwork/lnd) as backend. Please make sure it is installed and fully synced before you install LightningTip.
 
@@ -16,7 +17,7 @@ The next step is embedding LightningTip on your website. Upload all files exclud
 
 There is a light theme available for LightningTip. If you want to use it **add** this to the head tag of your HTML file:
 
-```
+```html
 <link rel="stylesheet" href="lightningTip_light.css">
 ```
 
@@ -31,6 +32,7 @@ When using LightningTip behind a proxy make sure the proxy supports [EventSource
 That's it! The only two things you need to take care about is keeping the LND node online and making sure that your incoming channels are sufficiently funded to receive tips. LightningTip will take care of everything else.
 
 ## How to build
+
 First of all make sure [Golang](https://golang.org/) and [Dep](https://github.com/golang/dep) are both correctly installed. Golang version 1.10 or newer is recommended.
 
 ```
@@ -43,6 +45,7 @@ make && make install
 To start run `$GOPATH/bin/lightningtip` or follow the instructions below to setup a service to run LightningTip automatically.
 
 ## Upgrading
+
 Make sure you stop any running LightningTip process before upgrading, then pull from source as follows:
 
 ```
@@ -65,5 +68,3 @@ In instances where the default LightningTip SSL configuration options are not wo
 
 * [LightningTip via Apache2 reverse proxy](https://github.com/michael1011/lightningtip/wiki/LightningTip-via-Apache2-reverse-proxy)
 * [LightningTip via Nginx reverse proxy](https://github.com/michael1011/lightningtip/wiki/LightningTip-via-Nginx-reverse-proxy)
-
-
