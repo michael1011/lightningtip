@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/jessevdk/go-flags"
-	"github.com/michael1011/lightningtip/backends"
-	"github.com/michael1011/lightningtip/database"
-	"github.com/michael1011/lightningtip/notifications"
-	"github.com/op/go-logging"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/michael1011/lightningtip/backends"
+	"github.com/michael1011/lightningtip/database"
+	"github.com/michael1011/lightningtip/notifications"
+	"github.com/op/go-logging"
 )
 
 const (
@@ -105,7 +107,7 @@ func initConfig() {
 		LND: &backends.LND{
 			GRPCHost:     defaultLndGRPCHost,
 			CertFile:     path.Join(getDefaultLndDir(), defaultLndCertFile),
-			MacaroonFile: path.Join(getDefaultLndDir(), defaultMacaroonFile),
+			MacaroonFile: getDefaultMacaroon(),
 		},
 
 		Mail: &notifications.Mail{
@@ -202,6 +204,29 @@ func getDefaultDataDir() (dir string) {
 	}
 
 	return cleanPath(dir)
+}
+
+// If the mainnet macaroon does exists it is preffered over all others
+func getDefaultMacaroon() string {
+	networksDir := filepath.Join(getDefaultLndDir(), "/data/chain/bitcoin/")
+	mainnetMacaroon := filepath.Join(networksDir, "mainnet/", defaultMacaroonFile)
+
+	if _, err := os.Stat(mainnetMacaroon); err == nil {
+		return mainnetMacaroon
+	}
+
+	networks, err := ioutil.ReadDir(networksDir)
+
+	if err == nil && len(networks) != 0 {
+		for _, subDir := range networks {
+			if subDir.IsDir() {
+				return filepath.Join(networksDir, networks[0].Name(), defaultMacaroonFile)
+			}
+		}
+	}
+
+	log.Warning("Could not find macaroon file")
+	return ""
 }
 
 func getDefaultLndDir() (dir string) {

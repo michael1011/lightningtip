@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"io"
+	"io/ioutil"
+
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
-	"io"
-	"io/ioutil"
 )
 
 type LND struct {
@@ -45,7 +46,7 @@ func (lnd *LND) Connect() error {
 			macaroon, err := getMacaroon(lnd.MacaroonFile)
 
 			if macaroon == nil && err != nil {
-				log.Error("Failed to read macaroon file of LND")
+				log.Error("Failed to read macaroon file of LND: ", err)
 
 			} else {
 				lnd.ctx = metadata.NewOutgoingContext(lnd.ctx, macaroon)
