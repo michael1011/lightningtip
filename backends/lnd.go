@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// LND contains all values needed to be able to connect to a node
 type LND struct {
 	GRPCHost     string `long:"grpchost" Description:"Host of the gRPC interface of LND"`
 	CertFile     string `long:"certfile" Description:"TLS certificate for the LND gRPC and REST services"`
@@ -22,6 +23,7 @@ type LND struct {
 	client lnrpc.LightningClient
 }
 
+// Connect to a node
 func (lnd *LND) Connect() error {
 	creds, err := credentials.NewClientTLSFromFile(lnd.CertFile, "")
 
@@ -61,6 +63,7 @@ func (lnd *LND) Connect() error {
 	return err
 }
 
+// GetInvoice gets and invoice from a node
 func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, rHash string, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
@@ -77,6 +80,7 @@ func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice 
 	return response.PaymentRequest, hex.EncodeToString(response.RHash), err
 }
 
+// InvoiceSettled checks if an invoice is settled by looking it up
 func (lnd *LND) InvoiceSettled(rHash string) (settled bool, err error) {
 	var invoice *lnrpc.Invoice
 
@@ -93,6 +97,7 @@ func (lnd *LND) InvoiceSettled(rHash string) (settled bool, err error) {
 	return invoice.Settled, err
 }
 
+// SubscribeInvoices subscribe to the invoice events of LND and calls a callback when one is settled
 func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPendingInvoices) error {
 	stream, err := lnd.client.SubscribeInvoices(lnd.ctx, &lnrpc.InvoiceSubscription{})
 
@@ -139,6 +144,8 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 	return err
 }
 
+// KeepAliveRequest is a dummy request to make sure the connection to LND doesn't time out if
+// LND and LightningTip are separated with a firewall
 func (lnd *LND) KeepAliveRequest() error {
 	_, err := lnd.client.GetInfo(lnd.ctx, &lnrpc.GetInfoRequest{})
 

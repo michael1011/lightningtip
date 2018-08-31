@@ -1,15 +1,16 @@
 package backends
 
-// For callbacks when an invoice gets settled
+// PublishInvoiceSettled is a callback for a settled invoice
 type PublishInvoiceSettled func(invoice string)
 
-// For callbacks when reconnecting
+// RescanPendingInvoices is a callbacks when reconnecting
 type RescanPendingInvoices func()
 
+// Backend is an interface that would allow for different implementations of Lightning to be used as backend
 type Backend interface {
 	Connect() error
 
-	// Amount in satoshi and expiry in seconds
+	// The amount is denominated in satoshis and the expiry in seconds
 	GetInvoice(description string, amount int64, expiry int64) (invoice string, rHash string, err error)
 
 	InvoiceSettled(rHash string) (settled bool, err error)

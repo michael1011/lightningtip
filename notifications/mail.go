@@ -9,15 +9,16 @@ import (
 	"strconv"
 )
 
+// Mail contains all values needed to be able to send a mail
 type Mail struct {
 	Recipient string `long:"recipient" Description:"Email address to which notifications get sent"`
 	Sender    string `long:"sender" Description:"Email address from which notifications get sent"`
 
-	SmtpServer string `long:"server" Description:"SMTP server with port for sending mails"`
+	SMTPServer string `long:"server" Description:"SMTP server with port for sending mails"`
 
-	SmtpSSL      bool   `long:"ssl" Description:"Whether SSL should be used or not"`
-	SmtpUser     string `long:"user" Description:"User for authenticating the SMTP connection"`
-	SmtpPassword string `long:"password" Description:"Password for authenticating the SMTP connection"`
+	SMTPSSL      bool   `long:"ssl" Description:"Whether SSL should be used or not"`
+	SMTPUser     string `long:"user" Description:"User for authenticating the SMTP connection"`
+	SMTPPassword string `long:"password" Description:"Password for authenticating the SMTP connection"`
 }
 
 const sendmail = "/usr/bin/mail"
@@ -26,6 +27,7 @@ const newLine = "\r\n"
 
 const subject = "You received a tip"
 
+// SendMail sends a mail
 func (mail *Mail) SendMail(amount int64, message string) {
 	body := "You received a tip of " + strconv.FormatInt(amount, 10) + " satoshis"
 
@@ -33,38 +35,47 @@ func (mail *Mail) SendMail(amount int64, message string) {
 		body += " with the message \"" + message + "\""
 	}
 
-	if mail.SmtpServer == "" {
+	if mail.SMTPServer == "" {
 		// "mail" command will be used for sending
-		var cmd *exec.Cmd
+		mail.sendMailCommand(body)
 
-		if mail.Sender == "" {
-			cmd = exec.Command(sendmail, "-s", subject, mail.Recipient)
+	} else {
+		// SMTP server will be used
+		mail.sendMailSMTP(body)
+	}
 
-		} else {
-			// Append "From" header
-			cmd = exec.Command(sendmail, "-s", subject, "-a", "From: "+mail.Sender, mail.Recipient)
-		}
+}
 
-		writer, err := cmd.StdinPipe()
+// Sends a mail with the "mail" command
+func (mail *Mail) sendMailCommand(body string) {
+	var cmd *exec.Cmd
+
+	if mail.Sender == "" {
+		cmd = exec.Command(sendmail, "-s", subject, mail.Recipient)
+
+	} else {
+		// Append "From" header
+		cmd = exec.Command(sendmail, "-s", subject, "-a", "From: "+mail.Sender, mail.Recipient)
+	}
+
+	writer, err := cmd.StdinPipe()
+
+	if err == nil {
+		err = cmd.Start()
 
 		if err == nil {
-			err = cmd.Start()
+			_, err = writer.Write([]byte(body))
 
 			if err == nil {
-				_, err = writer.Write([]byte(body))
+				err = writer.Close()
 
 				if err == nil {
-					err = writer.Close()
+					err = cmd.Wait()
 
 					if err == nil {
-						err = cmd.Wait()
+						logSent()
 
-						if err == nil {
-							logSent()
-
-							return
-						}
-
+						return
 					}
 
 				}
@@ -73,42 +84,38 @@ func (mail *Mail) SendMail(amount int64, message string) {
 
 		}
 
-		logSendingFailed(err)
-
-	} else {
-		// SMTP server will be used
-		mail.sendMailSmtp(body)
 	}
 
+	logSendingFailed(err)
 }
 
-func (mail *Mail) sendMailSmtp(body string) {
-	// Because the SMTP method does'n have a dedicated field for the subject
+func (mail *Mail) sendMailSMTP(body string) {
+	// Because the SMTP method doesn't have a dedicated field for the subject
 	// it will be in the body of the message
 	body = "Subject: " + subject + newLine + body
 
 	var auth smtp.Auth
 
-	host, _, err := net.SplitHostPort(mail.SmtpServer)
+	host, _, err := net.SplitHostPort(mail.SMTPServer)
 
 	if err != nil {
-		log.Error("Failed to parse host of SMTP server: " + mail.SmtpServer)
+		log.Error("Failed to parse host of SMTP server: " + mail.SMTPServer)
 
 		return
 	}
 
-	if mail.SmtpUser != "" {
+	if mail.SMTPUser != "" {
 		// If there are credentials they are used
 		auth = smtp.PlainAuth(
 			"",
-			mail.SmtpUser,
-			mail.SmtpPassword,
+			mail.SMTPUser,
+			mail.SMTPPassword,
 			host,
 		)
 
 	}
 
-	if mail.SmtpSSL {
+	if mail.SMTPSSL {
 		body = "From: " + mail.Sender + newLine + "To: " + mail.Recipient + newLine + body
 
 		tlsConfig := &tls.Config{
@@ -116,7 +123,7 @@ func (mail *Mail) sendMailSmtp(body string) {
 			InsecureSkipVerify: true,
 		}
 
-		con, err := tls.Dial("tcp", mail.SmtpServer, tlsConfig)
+		con, err := tls.Dial("tcp", mail.SMTPServer, tlsConfig)
 
 		defer con.Close()
 
@@ -164,7 +171,7 @@ func (mail *Mail) sendMailSmtp(body string) {
 
 	} else {
 		err := smtp.SendMail(
-			mail.SmtpServer,
+			mail.SMTPServer,
 			auth,
 			mail.Sender,
 			[]string{mail.Recipient},
