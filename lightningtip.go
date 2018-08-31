@@ -3,15 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/donovanhide/eventsource"
-	"github.com/michael1011/lightningtip/database"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/donovanhide/eventsource"
+	"github.com/michael1011/lightningtip/database"
 )
+
+// PendingInvoice is for keeping alist of unpaid invoices
+type PendingInvoice struct {
+	Invoice string
+	Amount  int64
+	Message string
+	RHash   string
+	Expiry  time.Time
+}
 
 const eventChannel = "invoiceSettled"
 
@@ -20,14 +30,6 @@ const couldNotParseError = "Could not parse values from request"
 var eventSrv *eventsource.Server
 
 var pendingInvoices []PendingInvoice
-
-type PendingInvoice struct {
-	Invoice string
-	Amount  int64
-	Message string
-	RHash   string
-	Expiry  time.Time
-}
 
 // To use the pendingInvoice type as event for the EventSource stream
 func (pending PendingInvoice) Id() string    { return "" }
@@ -41,7 +43,7 @@ type invoiceRequest struct {
 
 type invoiceResponse struct {
 	Invoice string
-	RHash string
+	RHash   string
 	Expiry  int64
 }
 
@@ -282,7 +284,7 @@ func invoiceSettledHandler(writer http.ResponseWriter, request *http.Request) {
 
 				}
 
-				writer.Write(marshalJson(invoiceSettledResponse{
+				writer.Write(marshalJSON(invoiceSettledResponse{
 					Settled: settled,
 				}))
 
@@ -335,23 +337,21 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 						Expiry:  time.Now().Add(expiryDuration),
 					})
 
-					writer.Write(marshalJson(invoiceResponse{
+					writer.Write(marshalJSON(invoiceResponse{
 						Invoice: invoice,
-						RHash: paymentHash,
+						RHash:   paymentHash,
 						Expiry:  cfg.TipExpiry,
 					}))
 
 					return
+				}
 
-				} else {
-					errorMessage = "Failed to create invoice"
+				errorMessage = "Failed to create invoice"
 
-					// This is way too hacky
-					// Maybe a cast to the gRPC error and get its error message directly
-					if fmt.Sprint(err)[:47] == "rpc error: code = Unknown desc = memo too large" {
-						errorMessage += ": message too long"
-					}
-
+				// This is way too hacky
+				// Maybe a cast to the gRPC error and get its error message directly
+				if fmt.Sprint(err)[:47] == "rpc error: code = Unknown desc = memo too large" {
+					errorMessage += ": message too long"
 				}
 
 			}
@@ -387,12 +387,12 @@ func handleHeaders(handler func(w http.ResponseWriter, r *http.Request)) http.Ha
 func writeError(writer http.ResponseWriter, message string) {
 	writer.WriteHeader(http.StatusBadRequest)
 
-	writer.Write(marshalJson(errorResponse{
+	writer.Write(marshalJSON(errorResponse{
 		Error: message,
 	}))
 }
 
-func marshalJson(data interface{}) []byte {
+func marshalJSON(data interface{}) []byte {
 	response, _ := json.MarshalIndent(data, "", "    ")
 
 	return response

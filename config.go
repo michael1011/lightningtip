@@ -45,11 +45,10 @@ const (
 	defaultRecipient = ""
 	defaultSender    = ""
 
-	defaultSmtpServer = ""
-
-	defaultSmtpSSL      = false
-	defaultSmtpUser     = ""
-	defaultSmtpPassword = ""
+	defaultSTMPServer   = ""
+	defaultSTMPSSL      = false
+	defaultSTMPUser     = ""
+	defaultSTMPPassword = ""
 )
 
 type config struct {
@@ -114,11 +113,10 @@ func initConfig() {
 			Recipient: defaultRecipient,
 			Sender:    defaultSender,
 
-			SmtpServer: defaultSmtpServer,
-
-			SmtpSSL:      defaultSmtpSSL,
-			SmtpUser:     defaultSmtpUser,
-			SmtpPassword: defaultSmtpPassword,
+			SMTPServer:   defaultSTMPServer,
+			SMTPSSL:      defaultSTMPSSL,
+			SMTPUser:     defaultSTMPUser,
+			SMTPPassword: defaultSTMPPassword,
 		},
 	}
 

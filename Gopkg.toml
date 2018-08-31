@@ -12,7 +12,7 @@
 
 [[constraint]]
   name = "github.com/lightningnetwork/lnd"
-  version = "0.4.1-beta"
+  version = "0.5.0-beta"
 
 [[constraint]]
   name = "github.com/op/go-logging"
