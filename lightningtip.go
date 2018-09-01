@@ -60,7 +60,7 @@ type errorResponse struct {
 }
 
 // TODO: add version flag
-// TODO: add option to show URI of Lightning node
+// TODO: don't start when "--help" flag is provided
 func main() {
 	initLog()
 

@@ -1,4 +1,3 @@
-# TODO: lint and fmt sub packages
 PKG := github.com/michael1011/lightningtip
 
 GOBUILD := go build -v
@@ -10,7 +9,7 @@ LINT_BIN := $(GO_BIN)/gometalinter.v2
 
 HAVE_DEP := $(shell command -v $(DEP_BIN) 2> /dev/null)
 
-GOLIST := go list $(PKG)/... | grep -v '/vendor/'
+LINT_LIST = $(go list -f '{{.Dir}}' ./...)
 
 GREEN := "\\033[0;32m"
 NC := "\\033[0m"
@@ -19,7 +18,7 @@ define print
 	echo $(GREEN)$1$(NC)
 endef
 
-LINT = $(LINT_BIN) \
+LINT = $(LINT_BIN) $(LINT_LIST) \
 	--disable-all \
 	--enable=gofmt \
 	--enable=vet \
@@ -59,7 +58,7 @@ scratch: dep build
 
 fmt:
 	@$(call print, "Formatting source.")
-	$(GOLIST) | go fmt -x
+	gofmt -s -w .
 
 lint: $(LINT_BIN)
 	@$(call print, "Linting source.")
