@@ -8,6 +8,15 @@ DEP_BIN := $(GO_BIN)/dep
 LINT_BIN := $(GO_BIN)/gometalinter.v2
 
 HAVE_DEP := $(shell command -v $(DEP_BIN) 2> /dev/null)
+HAVE_LINTER := $(shell command -v $(LINT_BIN) 2> /dev/null)
+
+$(LINT_BIN):
+	@$(call print, "Fetching gometalinter.v2")
+	go get -u gopkg.in/alecthomas/gometalinter.v2
+
+$(DEP_BIN):
+	@$(call print, "Fetching dep")
+	go get -u github.com/golang/dep/cmd/dep
 
 LINT_LIST = $(go list -f '{{.Dir}}' ./...)
 
@@ -28,13 +37,9 @@ LINT = $(LINT_BIN) $(LINT_LIST) \
 	grep -v 'ALL_CAPS\|OP_' 2>&1 | \
 	tee /dev/stderr
 
-default: scratch
+default: dep build
 
 # Dependencies
-
-$(DEP_BIN):
-	@$(call print, "Fetching dep")
-	go get -u github.com/golang/dep/cmd/dep
 
 dep: $(DEP_BIN)
 	@$(call print, "Compiling dependencies")
@@ -52,15 +57,13 @@ install:
 	$(GOINSTALL) $(PKG)
 	$(GOINSTALL) $(PKG)/cmd/tipreport
 
-scratch: dep build
-
 # Utils
 
 fmt:
-	@$(call print, "Formatting source.")
+	@$(call print, "Formatting source")
 	gofmt -s -w .
 
 lint: $(LINT_BIN)
-	@$(call print, "Linting source.")
+	@$(call print, "Linting source")
 	$(LINT_BIN) --install 1> /dev/null
 	test -z "$$($(LINT))"

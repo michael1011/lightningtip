@@ -32,9 +32,15 @@ var eventSrv *eventsource.Server
 var pendingInvoices []PendingInvoice
 
 // To use the pendingInvoice type as event for the EventSource stream
-func (pending PendingInvoice) Id() string    { return "" }
+
+// Id gets the ID of the event which is not neede in our scenario
+func (pending PendingInvoice) Id() string { return "" } // nolint: golint
+
+// Event is for using a different type of event than "data"
 func (pending PendingInvoice) Event() string { return "" }
-func (pending PendingInvoice) Data() string  { return pending.RHash }
+
+// Data tells EventSource what data to write
+func (pending PendingInvoice) Data() string { return pending.RHash }
 
 type invoiceRequest struct {
 	Amount  int64

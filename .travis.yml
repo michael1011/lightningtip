@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - "1.10"
+
+script:
+  - make dep
+  - make build
+  - make lint
