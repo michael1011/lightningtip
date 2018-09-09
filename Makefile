@@ -10,6 +10,8 @@ LINT_BIN := $(GO_BIN)/gometalinter.v2
 HAVE_DEP := $(shell command -v $(DEP_BIN) 2> /dev/null)
 HAVE_LINTER := $(shell command -v $(LINT_BIN) 2> /dev/null)
 
+default: dep build
+
 $(LINT_BIN):
 	@$(call print, "Fetching gometalinter.v2")
 	go get -u gopkg.in/alecthomas/gometalinter.v2
@@ -36,8 +38,6 @@ LINT = $(LINT_BIN) $(LINT_LIST) \
 	--deadline=4m $(GOLISTLINT) 2>&1 | \
 	grep -v 'ALL_CAPS\|OP_' 2>&1 | \
 	tee /dev/stderr
-
-default: dep build
 
 # Dependencies
 
