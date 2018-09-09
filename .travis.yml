@@ -1,5 +1,9 @@
 language: go
 
+cache:
+  directories:
+    - "vendor"
+
 go:
   - "1.10"
   - "1.11"

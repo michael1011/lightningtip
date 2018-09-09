@@ -20,8 +20,6 @@ $(DEP_BIN):
 	@$(call print, "Fetching dep")
 	go get -u github.com/golang/dep/cmd/dep
 
-LINT_LIST = $(go list -f '{{.Dir}}' ./...)
-
 GREEN := "\\033[0;32m"
 NC := "\\033[0m"
 
@@ -29,13 +27,15 @@ define print
 	echo $(GREEN)$1$(NC)
 endef
 
-LINT = $(LINT_BIN) $(LINT_LIST) \
+LINT_LIST = $(shell go list -f '{{.Dir}}' ./...)
+
+LINT = $(LINT_BIN) \
 	--disable-all \
 	--enable=gofmt \
 	--enable=vet \
 	--enable=golint \
 	--line-length=72 \
-	--deadline=4m $(GOLISTLINT) 2>&1 | \
+	--deadline=4m $(LINT_LIST) 2>&1 | \
 	grep -v 'ALL_CAPS\|OP_' 2>&1 | \
 	tee /dev/stderr
 
