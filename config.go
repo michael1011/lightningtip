@@ -14,6 +14,7 @@ import (
 	"github.com/michael1011/lightningtip/backends"
 	"github.com/michael1011/lightningtip/database"
 	"github.com/michael1011/lightningtip/notifications"
+	"github.com/michael1011/lightningtip/version"
 	"github.com/op/go-logging"
 )
 
@@ -51,30 +52,37 @@ const (
 	defaultSTMPPassword = ""
 )
 
+type helpOptions struct {
+	ShowHelp    bool `long:"help" short:"h" description:"Display this help message"`
+	ShowVersion bool `long:"version" short:"v" description:"Display version and exit"`
+}
+
 type config struct {
-	ConfigFile string `long:"config" Description:"Location of the config file"`
+	ConfigFile string `long:"config" description:"Location of the config file"`
 
-	DataDir string `long:"datadir" Description:"Location of the data stored by LightningTip"`
+	DataDir string `long:"datadir" description:"Location of the data stored by LightningTip"`
 
-	LogFile  string `long:"logfile" Description:"Location of the log file"`
-	LogLevel string `long:"loglevel" Description:"Log level: debug, info, warning, error"`
+	LogFile  string `long:"logfile" description:"Location of the log file"`
+	LogLevel string `long:"loglevel" description:"Log level: debug, info, warning, error"`
 
-	DatabaseFile string `long:"databasefile" Description:"Location of the database file to store settled invoices"`
+	DatabaseFile string `long:"databasefile" description:"Location of the database file to store settled invoices"`
 
-	RESTHost    string `long:"resthost" Description:"Host for the REST interface of LightningTip"`
-	TLSCertFile string `long:"tlscertfile" Description:"Certificate for using LightningTip via HTTPS"`
-	TLSKeyFile  string `long:"tlskeyfile" Description:"Certificate for using LightningTip via HTTPS"`
+	RESTHost    string `long:"resthost" description:"Host for the REST interface of LightningTip"`
+	TLSCertFile string `long:"tlscertfile" description:"Certificate for using LightningTip via HTTPS"`
+	TLSKeyFile  string `long:"tlskeyfile" description:"Certificate for using LightningTip via HTTPS"`
 
-	AccessDomain string `long:"accessdomain" Description:"The domain you are using LightningTip from"`
+	AccessDomain string `long:"accessdomain" description:"The domain you are using LightningTip from"`
 
-	TipExpiry int64 `long:"tipexpiry" Description:"Invoice expiry time in seconds"`
+	TipExpiry int64 `long:"tipexpiry" description:"Invoice expiry time in seconds"`
 
-	ReconnectInterval int64 `long:"reconnectinterval" Description:"Reconnect interval to LND in seconds"`
-	KeepAliveInterval int64 `long:"keepaliveinterval" Description:"Send a dummy request to LND to prevent timeouts "`
+	ReconnectInterval int64 `long:"reconnectinterval" description:"Reconnect interval to LND in seconds"`
+	KeepAliveInterval int64 `long:"keepaliveinterval" description:"Send a dummy request to LND to prevent timeouts "`
 
 	LND *backends.LND `group:"LND" namespace:"lnd"`
 
 	Mail *notifications.Mail `group:"Mail" namespace:"mail"`
+
+	Help *helpOptions `group:"Help Options"`
 }
 
 var cfg config
@@ -121,9 +129,22 @@ func initConfig() {
 	}
 
 	// Ignore unknown flags the first time parsing command line flags to prevent showing the unknown flag error twice
-	flags.NewParser(&cfg, flags.IgnoreUnknown).Parse()
+	parser := flags.NewParser(&cfg, flags.IgnoreUnknown)
+	parser.Parse()
 
 	errFile := flags.IniParse(cfg.ConfigFile, &cfg)
+
+	// If the user just wants to see the version initializing everything else is irrelevant
+	if cfg.Help.ShowVersion {
+		version.PrintVersion()
+		os.Exit(0)
+	}
+
+	// If the user just wants to see the help message
+	if cfg.Help.ShowHelp {
+		parser.WriteHelp(os.Stdout)
+		os.Exit(0)
+	}
 
 	// Parse flags again to override config file
 	_, err := flags.Parse(&cfg)

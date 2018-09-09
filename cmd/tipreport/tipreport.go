@@ -3,19 +3,19 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/urfave/cli"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/michael1011/lightningtip/version"
+	"github.com/urfave/cli"
 )
 
 const (
-	version = "1.0.0"
-
 	defaultDataDir      = "LightningTip"
 	defaultDatabaseFile = "tips.db"
 )
@@ -26,7 +26,7 @@ func main() {
 	app.Name = "tipreport"
 	app.Usage = "display received tips"
 
-	app.Version = version
+	app.Version = version.Version
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

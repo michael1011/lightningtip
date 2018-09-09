@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/op/go-logging"
 	"os"
+
+	"github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("")
-var logFormat = logging.MustStringFormatter("%{time:2006-01-02 15:04:05.000} [%{level}] %{message}")
+var logFormat = logging.MustStringFormatter("%{time:2006-01-02 15:04:05} [%{level}] %{message}")
 
 var backendConsole = logging.NewLogBackend(os.Stdout, "", 0)
 
