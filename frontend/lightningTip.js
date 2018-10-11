@@ -1,6 +1,6 @@
 // Edit this variable if you are not running LightningTip on the same domain or IP address as your webserver or not on port 8081
 // Don't forget the "/" at the end!
-var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
+var requestUrl = window.location.protocol + "//" + window.location.hostname + "/tiprest/";
 
 // To prohibit multiple requests at the same time
 var requestPending = false;
@@ -69,7 +69,7 @@ function getInvoice() {
 
                                 console.log("Starting listening for invoice to get settled");
 
-                                listenInvoiceSettled(json.RHash);
+                                listenInvoiceSettled(json.RHash, json.Picture);
 
                                 invoice = json.Invoice;
 
@@ -135,7 +135,7 @@ function getInvoice() {
 
 }
 
-function listenInvoiceSettled(rHash) {
+function listenInvoiceSettled(rHash, picture) {
     try {
         var eventSrc = new EventSource(requestUrl + "eventsource");
 
@@ -145,7 +145,7 @@ function listenInvoiceSettled(rHash) {
 
                 eventSrc.close();
 
-                showThankYouScreen();
+                showThankYouScreen(picture);
             }
 
         };
@@ -170,7 +170,7 @@ function listenInvoiceSettled(rHash) {
 
                                 clearInterval(interval);
 
-                                showThankYouScreen();
+                                showThankYouScreen(json.Picture);
                             }
 
                         }
@@ -190,11 +190,14 @@ function listenInvoiceSettled(rHash) {
 
 }
 
-function showThankYouScreen() {
+function showThankYouScreen(picture) {
     var wrapper = document.getElementById("lightningTip");
 
     wrapper.innerHTML = "<p id=\"lightningTipLogo\">⚡</p>";
     wrapper.innerHTML += "<a id='lightningTipFinished'>Thank you for your tip!</a>";
+    if (picture !== "") {
+      wrapper.innerHTML += "<a href=" + picture + "><img height=150 src=" + picture + "></a>";
+    }
 }
 
 function starTimer(duration, element) {

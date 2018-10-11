@@ -11,7 +11,7 @@ type Backend interface {
 	Connect() error
 
 	// The amount is denominated in satoshis and the expiry in seconds
-	GetInvoice(description string, amount int64, expiry int64) (invoice string, rHash string, err error)
+	GetInvoice(description string, amount int64, expiry int64) (invoice string, rHash string, picture string, err error)
 
 	InvoiceSettled(rHash string) (settled bool, err error)
 

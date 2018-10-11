@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 
 	"github.com/lightningnetwork/lnd/lnrpc"
+	"github.com/michael1011/lightningtip/image"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
@@ -64,7 +65,7 @@ func (lnd *LND) Connect() error {
 }
 
 // GetInvoice gets and invoice from a node
-func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, rHash string, err error) {
+func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice string, rHash string, picture string, err error) {
 	var response *lnrpc.AddInvoiceResponse
 
 	response, err = lnd.client.AddInvoice(lnd.ctx, &lnrpc.Invoice{
@@ -74,10 +75,10 @@ func (lnd *LND) GetInvoice(message string, amount int64, expiry int64) (invoice 
 	})
 
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
-	return response.PaymentRequest, hex.EncodeToString(response.RHash), err
+	return response.PaymentRequest, hex.EncodeToString(response.RHash), image.GetImagePath(hex.EncodeToString(response.RHash)), err
 }
 
 // InvoiceSettled checks if an invoice is settled by looking it up
@@ -93,7 +94,7 @@ func (lnd *LND) InvoiceSettled(rHash string) (settled bool, err error) {
 	if err != nil {
 		return false, err
 	}
-
+  _ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaidSat)
 	return invoice.Settled, err
 }
 
@@ -128,6 +129,7 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 			}
 
 			if invoice.Settled {
+        _ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaidSat)
 				go publish(invoice.PaymentRequest)
 			}
 
