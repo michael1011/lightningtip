@@ -1,6 +1,8 @@
 PKG := github.com/michael1011/lightningtip
 
-GOBUILD := go build -v
+# Enable image support via ImageMagicks MagickWand API. Requires MagickWand C API to be installed
+# IMAGICK := -tags imagick
+GOBUILD := go build -v ${IMAGICK}
 GOINSTALL := go install -v
 
 GO_BIN := ${GOPATH}/bin
