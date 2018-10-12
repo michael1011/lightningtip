@@ -130,6 +130,7 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 
 			if invoice.Settled {
         _ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaidSat)
+        log.Debug("Payment request settled: ", invoice.PaymentRequest)
 				go publish(invoice.PaymentRequest)
 			}
 
