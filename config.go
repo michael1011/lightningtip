@@ -12,8 +12,8 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/michael1011/lightningtip/backends"
-	"github.com/michael1011/lightningtip/image"
 	"github.com/michael1011/lightningtip/database"
+	"github.com/michael1011/lightningtip/image"
 	"github.com/michael1011/lightningtip/notifications"
 	"github.com/michael1011/lightningtip/version"
 	"github.com/op/go-logging"
@@ -52,20 +52,19 @@ const (
 	defaultSTMPUser     = ""
 	defaultSTMPPassword = ""
 
-  defaultImageDir = ""
-  defaultImageURLDir = ""
-  defaultImageFile = ""
-  defaultImageTextBeforeAmt = "I paid a random dude"
-  defaultImageTextAfterAmt = "satoshis with Lightning Network"
-  defaultImageTextSecondLine = "but all I got was this picture of his dog."
-  defaultImageTextFirstLineX = 25
-  defaultImageTextFirstLineY = 165
-  defaultImageTextSecondLineX = 25
-  defaultImageTextSecondLineY = 365
-  defaultImageTextColor = "black"
-  defaultImageTextFont = "Verdana-Bold-Italic"
-  defaultImageTextSize = 150
-
+	defaultImageDir             = ""
+	defaultImageURLDir          = ""
+	defaultImageFile            = ""
+	defaultImageTextBeforeAmt   = "I paid a random dude"
+	defaultImageTextAfterAmt    = "satoshis with Lightning Network"
+	defaultImageTextSecondLine  = "but all I got was this picture of his dog."
+	defaultImageTextFirstLineX  = 25
+	defaultImageTextFirstLineY  = 165
+	defaultImageTextSecondLineX = 25
+	defaultImageTextSecondLineY = 365
+	defaultImageTextColor       = "black"
+	defaultImageTextFont        = "Verdana-Bold-Italic"
+	defaultImageTextSize        = 150
 )
 
 type helpOptions struct {
@@ -94,8 +93,8 @@ type config struct {
 	ReconnectInterval int64 `long:"reconnectinterval" description:"Reconnect interval to LND in seconds"`
 	KeepAliveInterval int64 `long:"keepaliveinterval" description:"Send a dummy request to LND to prevent timeouts "`
 
-	LND *backends.LND `group:"LND" namespace:"lnd"`
-	Image *image.Image `group:"Image" namespace:"image"`
+	LND   *backends.LND `group:"LND" namespace:"lnd"`
+	Image *image.Image  `group:"Image" namespace:"image"`
 
 	Mail *notifications.Mail `group:"Mail" namespace:"mail"`
 
@@ -134,21 +133,21 @@ func initConfig() {
 			MacaroonFile: getDefaultMacaroon(),
 		},
 
-    Image : &image.Image{
-      ImageDir: defaultImageDir,
-      ImageURLDir: defaultImageURLDir,
-      ImageFile: defaultImageFile,
-      ImageTextBeforeAmt: defaultImageTextBeforeAmt,
-      ImageTextAfterAmt: defaultImageTextAfterAmt,
-      ImageTextSecondLine: defaultImageTextSecondLine,
-      ImageTextFirstLineX: defaultImageTextFirstLineX,
-      ImageTextFirstLineY: defaultImageTextFirstLineY,
-      ImageTextSecondLineX: defaultImageTextSecondLineX,
-      ImageTextSecondLineY: defaultImageTextSecondLineY,
-      ImageTextColor: defaultImageTextColor,
-      ImageTextFont: defaultImageTextFont,
-      ImageTextSize: defaultImageTextSize,
-    },
+		Image: &image.Image{
+			ImageDir:             defaultImageDir,
+			ImageURLDir:          defaultImageURLDir,
+			ImageFile:            defaultImageFile,
+			ImageTextBeforeAmt:   defaultImageTextBeforeAmt,
+			ImageTextAfterAmt:    defaultImageTextAfterAmt,
+			ImageTextSecondLine:  defaultImageTextSecondLine,
+			ImageTextFirstLineX:  defaultImageTextFirstLineX,
+			ImageTextFirstLineY:  defaultImageTextFirstLineY,
+			ImageTextSecondLineX: defaultImageTextSecondLineX,
+			ImageTextSecondLineY: defaultImageTextSecondLineY,
+			ImageTextColor:       defaultImageTextColor,
+			ImageTextFont:        defaultImageTextFont,
+			ImageTextSize:        defaultImageTextSize,
+		},
 
 		Mail: &notifications.Mail{
 			Recipient: defaultRecipient,
@@ -166,9 +165,9 @@ func initConfig() {
 	parser.Parse()
 
 	errFile := flags.IniParse(cfg.ConfigFile, &cfg)
-  if(cfg.Image.ImageDir != "") {
-    image.SetImageCfg(*cfg.Image)
-  }
+	if cfg.Image.ImageDir != "" {
+		image.SetImageCfg(*cfg.Image)
+	}
 
 	// If the user just wants to see the version initializing everything else is irrelevant
 	if cfg.Help.ShowVersion {
