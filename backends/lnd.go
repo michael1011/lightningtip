@@ -94,7 +94,7 @@ func (lnd *LND) InvoiceSettled(rHash string) (settled bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	_ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaid)
+	_ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaid/1000)
 	return invoice.Settled, err
 }
 
@@ -129,7 +129,7 @@ func (lnd *LND) SubscribeInvoices(publish PublishInvoiceSettled, rescan RescanPe
 			}
 
 			if invoice.Settled {
-				_ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaid)
+				_ = image.GenerateImage(hex.EncodeToString(invoice.RHash), invoice.AmtPaid/1000)
 				log.Debug("Payment request settled: ", invoice.PaymentRequest)
 				go publish(invoice.PaymentRequest)
 			}

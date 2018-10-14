@@ -52,19 +52,15 @@ const (
 	defaultSTMPUser     = ""
 	defaultSTMPPassword = ""
 
-	defaultImageDir             = ""
-	defaultImageURLDir          = ""
-	defaultImageFile            = ""
-	defaultImageTextBeforeAmt   = "I paid a random dude"
-	defaultImageTextAfterAmt    = "satoshis with Lightning Network"
-	defaultImageTextSecondLine  = "but all I got was this picture of his dog."
-	defaultImageTextFirstLineX  = 25
-	defaultImageTextFirstLineY  = 165
-	defaultImageTextSecondLineX = 25
-	defaultImageTextSecondLineY = 365
-	defaultImageTextColor       = "black"
-	defaultImageTextFont        = "Verdana-Bold-Italic"
-	defaultImageTextSize        = 150
+	defaultImageDir       = ""
+	defaultImageURLDir    = ""
+	defaultImageFile      = ""
+	defaultImageText      = "I paid a random dude  {Amount} satoshi\nbut all I got was this picture of his dog"
+	defaultImageTextX     = 25
+	defaultImageTextY     = 165
+	defaultImageTextColor = "black"
+	defaultImageTextFont  = "Verdana-Bold-Italic"
+	defaultImageTextSize  = 150
 )
 
 type helpOptions struct {
@@ -134,19 +130,15 @@ func initConfig() {
 		},
 
 		Image: &image.Image{
-			ImageDir:             defaultImageDir,
-			ImageURLDir:          defaultImageURLDir,
-			ImageFile:            defaultImageFile,
-			ImageTextBeforeAmt:   defaultImageTextBeforeAmt,
-			ImageTextAfterAmt:    defaultImageTextAfterAmt,
-			ImageTextSecondLine:  defaultImageTextSecondLine,
-			ImageTextFirstLineX:  defaultImageTextFirstLineX,
-			ImageTextFirstLineY:  defaultImageTextFirstLineY,
-			ImageTextSecondLineX: defaultImageTextSecondLineX,
-			ImageTextSecondLineY: defaultImageTextSecondLineY,
-			ImageTextColor:       defaultImageTextColor,
-			ImageTextFont:        defaultImageTextFont,
-			ImageTextSize:        defaultImageTextSize,
+			ImageDir:       defaultImageDir,
+			ImageURLDir:    defaultImageURLDir,
+			ImageFile:      defaultImageFile,
+			ImageText:      defaultImageText,
+			ImageTextX:     defaultImageTextX,
+			ImageTextY:     defaultImageTextY,
+			ImageTextColor: defaultImageTextColor,
+			ImageTextFont:  defaultImageTextFont,
+			ImageTextSize:  defaultImageTextSize,
 		},
 
 		Mail: &notifications.Mail{
