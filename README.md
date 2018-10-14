@@ -35,9 +35,16 @@ That's it! The only two things you need to take care about is keeping the LND no
 
 First of all make sure [Golang](https://golang.org/) and [Dep](https://github.com/golang/dep) are both correctly installed. Golang version 1.10 or newer is recommended.
 
+If you want to return a picture, make sure you install ImageMagick MagickWand C API. For example (Ubuntu/Debian): 
+
+sudo apt-get install libmagickwand-dev
+
+
+To enable it, edit Makefile and enable the line with IMAGICK : = -tags imagick 
 ```
 go get -d github.com/michael1011/lightningtip
 cd $GOPATH/src/github.com/michael1011/lightningtip
+
 
 make && make install
 ```

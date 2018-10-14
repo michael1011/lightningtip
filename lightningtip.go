@@ -50,6 +50,7 @@ type invoiceRequest struct {
 type invoiceResponse struct {
 	Invoice string
 	RHash   string
+	Picture string
 	Expiry  int64
 }
 
@@ -319,7 +320,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 
 		if err == nil {
 			if body.Amount != 0 {
-				invoice, paymentHash, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
+				invoice, paymentHash, picture, err := backend.GetInvoice(body.Message, body.Amount, cfg.TipExpiry)
 
 				if err == nil {
 					logMessage := "Created invoice with amount of " + strconv.FormatInt(body.Amount, 10) + " satoshis"
@@ -346,6 +347,7 @@ func getInvoiceHandler(writer http.ResponseWriter, request *http.Request) {
 					writer.Write(marshalJSON(invoiceResponse{
 						Invoice: invoice,
 						RHash:   paymentHash,
+						Picture: picture,
 						Expiry:  cfg.TipExpiry,
 					}))
 
