@@ -1,4 +1,5 @@
 # LightningTip
+
 A simple way to accept tips via the Lightning Network on your website. If want to tip me you can find my instance of LightningTip [here](https://michael1011.at/lightning.html).
 
 [robclark56](https://github.com/robclark56) forked LightningTip and rewrote the backend in **PHP**. His fork is called [LightningTip-PHP](https://github.com/robclark56/lightningtip) and is a great alternative if you are not able to run the executable.
@@ -33,9 +34,9 @@ That's it! The only two things you need to take care about is keeping the LND no
 
 ## How to build
 
-First of all make sure [Golang](https://golang.org/) and [Dep](https://github.com/golang/dep) are both correctly installed. Golang version 1.10 or newer is recommended.
+First of all make sure [Golang](https://golang.org/) version 1.11 or newer is correctly installed.
 
-```
+```bash
 go get -d github.com/michael1011/lightningtip
 cd $GOPATH/src/github.com/michael1011/lightningtip
 
@@ -48,7 +49,7 @@ To start run `$GOPATH/bin/lightningtip` or follow the instructions below to setu
 
 Make sure you stop any running LightningTip process before upgrading, then pull from source as follows:
 
-```
+```bash
 cd $GOPATH/src/github.com/michael1011/lightningtip
 git pull
 
