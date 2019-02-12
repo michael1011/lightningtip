@@ -2,6 +2,11 @@
 // Don't forget the "/" at the end!
 var requestUrl = window.location.protocol + "//" + window.location.hostname + ":8081/";
 
+// Used for development
+if (window.location.protocol === "file:") {
+    requestUrl = "http://localhost:8081/"
+}
+
 // To prohibit multiple requests at the same time
 var requestPending = false;
 

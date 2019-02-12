@@ -10,12 +10,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/jessevdk/go-flags"
+	flags "github.com/jessevdk/go-flags"
 	"github.com/michael1011/lightningtip/backends"
 	"github.com/michael1011/lightningtip/database"
 	"github.com/michael1011/lightningtip/notifications"
 	"github.com/michael1011/lightningtip/version"
-	"github.com/op/go-logging"
+	logging "github.com/op/go-logging"
 )
 
 const (
@@ -244,7 +244,6 @@ func getDefaultMacaroon() string {
 		}
 	}
 
-	log.Warning("Could not find macaroon file")
 	return ""
 }
 

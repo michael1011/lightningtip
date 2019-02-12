@@ -48,7 +48,7 @@ func (lnd *LND) Connect() error {
 			macaroon, err := getMacaroon(lnd.MacaroonFile)
 
 			if macaroon == nil && err != nil {
-				log.Error("Failed to read macaroon file of LND: ", err)
+				log.Error("Failed to read macaroon file of LND: ", err.Error())
 
 			} else {
 				lnd.ctx = metadata.NewOutgoingContext(lnd.ctx, macaroon)
